@@ -1,11 +1,15 @@
-import os
+import os.path
 import pickle
 import socketserver
 import threading
+import warnings
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+
+warnings.filterwarnings("ignore")
+
 
 HOST = 'localhost'
 PORT = 1234
@@ -18,11 +22,19 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
         data = self.request.recv(1024)
         df = pd.read_json(data.decode())
         print(df)
-        nparr = df.as_matrix()
-        answer = self.server.model.predict(nparr)
-        print(answer)
-        self.request.send(bytes(str(answer[0]), 'utf8'))
-    
+
+        if 'Class' in df.columns:
+            print('labeled data')
+            if os.path.isfile("labeleddata.csv"):
+                df.to_csv("labeleddata.csv", mode = 'a', header = False, index = False)
+            else:
+                df.to_csv("labeleddata.csv", mode = 'w', index = False)
+        else:
+            nparr = df.as_matrix()
+            answer = self.server.model.predict(nparr)
+            print('answer : ' + str(answer[0]))
+            self.request.send(bytes(str(answer[0]), 'utf8'))
+            
 
 def runServer(path_model):
     print("------- Server start -------")
