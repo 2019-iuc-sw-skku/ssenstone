@@ -1,11 +1,15 @@
 import pickle
-import pandas as pd
+
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.model_selection import cross_val_score, train_test_split
+
 import mglearn
+
+
 class CCFDT:
     def __init__(self, RSEED, TESTP, fname ):
         self.RSEED = RSEED

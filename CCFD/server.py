@@ -1,11 +1,11 @@
+import os
 import pickle
+import socketserver
+import threading
+
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-import socketserver
-import os
-
-import threading
 
 HOST = 'localhost'
 PORT = 1234
@@ -13,7 +13,7 @@ PORT = 1234
 class MyTcpHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-        data_transferred = 0
+#        data_transferred = 0
         print('[%s] is connected' %self.client_address[0])
         data = self.request.recv(1024)
         df = pd.read_json(data.decode())
