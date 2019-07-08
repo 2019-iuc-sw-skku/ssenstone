@@ -1,7 +1,9 @@
-import warnings
-import socket
 import random
+import socket
+import warnings
+
 import pandas as pd
+
 import fraud_index
 
 warnings.filterwarnings("ignore")
