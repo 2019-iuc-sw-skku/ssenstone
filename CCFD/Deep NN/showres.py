@@ -11,7 +11,7 @@ LABELS = ["Normal","Fraud"]
 RANDOM_SEED = 1398
 TEST_PCT = 0.8
 
-df = pd.read_csv("./creditcard.csv")
+df = pd.read_csv("./CCFD/creditcard.csv")
 df_norm = df
 df_norm['Time'] = StandardScaler().fit_transform(df_norm['Time'].values.reshape(-1, 1))
 df_norm['Amount'] = StandardScaler().fit_transform(df_norm['Amount'].values.reshape(-1, 1))
