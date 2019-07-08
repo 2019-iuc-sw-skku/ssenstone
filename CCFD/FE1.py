@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import pickle
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -95,6 +96,9 @@ class Ui_Dialog(object):
         testPer=self.line_TESTP.text()
         fileName=self.line_FNAME.text()
         # self.la_FNAME.setText(fileName) #test
+        list={'modelNumber','randomSeed', 'testPer','fileName'}
+        with open('list.txt','wb') as f:
+            pickle.dump(list, f)
 
 if __name__ == "__main__":
     import sys
