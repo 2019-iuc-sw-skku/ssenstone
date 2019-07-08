@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import os.path
-=======
-import warnings
->>>>>>> b9f66f3e21be9244668cb2670ce1845cceb1f7ca
 import pickle
 import socketserver
 import threading
@@ -13,10 +9,6 @@ import pandas as pd
 import seaborn as sns
 
 warnings.filterwarnings("ignore")
-<<<<<<< HEAD
-
-=======
->>>>>>> b9f66f3e21be9244668cb2670ce1845cceb1f7ca
 
 HOST = 'localhost'
 PORT = 1234
@@ -24,7 +16,6 @@ PORT = 1234
 class MyTcpHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-        data_transferred = 0
         print('[%s] is connected' %self.client_address[0])
         data = self.request.recv(1024)
         df = pd.read_json(data.decode())
@@ -32,7 +23,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
 
         if 'Class' in df.columns:
             print('labeled data')
-            if os.path.isfile("labeleddata.csv"):
+            if os.path.isfile("labeleddagit ta.csv"):
                 df.to_csv("labeleddata.csv", mode = 'a', header = False, index = False)
             else:
                 df.to_csv("labeleddata.csv", mode = 'w', index = False)
@@ -42,7 +33,6 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             print('answer : ' + str(answer[0]))
             self.request.send(bytes(str(answer[0]), 'utf8'))
             
-
 def runServer(path_model):
     print("------- Server start -------")
 
