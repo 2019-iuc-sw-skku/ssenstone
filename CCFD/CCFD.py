@@ -1,13 +1,12 @@
 import pickle
 
 import matplotlib.pyplot as plt
+import mglearn
 import pandas as pd
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import cross_val_score, train_test_split
-
-import mglearn
 
 
 class CCFDT:
