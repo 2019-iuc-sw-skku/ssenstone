@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore")
 
 HOST = 'localhost'
 PORT = 1234
-DATA_AMOUNT = 20
+DATA_AMOUNT = 100
 
 data = pd.read_csv("./creditcard.csv")
 data_nolabel = data
@@ -31,27 +31,21 @@ def throwdata(datatype, random_index):
 
         if datatype == 'labeled':
             data_string = data[random_index : random_index + 1].to_json()
-            sock.sendall(data_string.encode())
-            return
         else:
             data_string = data_nolabel[random_index : random_index + 1].to_json()
-            sock.sendall(data_string.encode())
-            return sock.recv(1024)
+        sock.sendall(data_string.encode())
+
+        return sock.recv(1024)
 
 
 for i in range(0, DATA_AMOUNT):
     random_index = get_index(i)
-    data_type = random.choice(['labeled','unlabeled'])
-#    data_type = 'unlabeled'
+#    data_type = random.choice(['labeled','unlabeled'])
+    data_type = 'unlabeled'
     
     print('transmission ' + str(i) + ' : Data no.' + str(random_index) + ', Data type : ' + data_type)
     
     ans = throwdata(data_type, random_index)
-
-    if data_type == 'labeled':
-        print("No received data")
-        continue
-    
     ans = int(str(ans, 'utf8'))
     if data.iloc[random_index][30] != ans:
         print(f"Wrong answer! True = {data.iloc[random_index]['Class']}, Predicted = {ans}")
