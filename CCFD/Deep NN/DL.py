@@ -1,7 +1,8 @@
 import keras
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import tensorflow as tf
 from keras import regularizers
 from keras.callbacks import ModelCheckpoint, TensorBoard
@@ -11,8 +12,9 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+LABELS = ["Normal","Fraud"]
 RANDOM_SEED = 1398
-TEST_PCT = 0.8
+TEST_PCT = 0.2
 
 df = pd.read_csv("./CCFD/creditcard.csv")
 normal_df = df[df.Class == 0]
@@ -33,7 +35,7 @@ train_x = train_x.values
 test_x = test_x.values
 
 input_dimension = train_x.shape[1]
-nb_epoch = 500
+nb_epoch = 100
 batch_size = 128
 encoding_dimension = 32
 learning_rate = 0.0000001
@@ -56,4 +58,19 @@ cp = ModelCheckpoint(filepath="fraud_dl.cp", save_best_only=True)
 tb = TensorBoard(log_dir='./dllogs', write_graph=True, write_images=True)
 
 history = AutoEncoderModel.fit(train_x, train_x, epochs=nb_epoch, batch_size=batch_size, shuffle=True, validation_data=(test_x, test_x), verbose=1, callbacks=[cp, tb]).history
-print(history)
+
+threshold_fixed = 5
+
+test_x_predictions = AutoEncoderModel.predict(test_x)
+mse = np.mean(np.power(test_x - test_x_predictions, 2), axis=1)
+error_df = pd.DataFrame({'Reconstruction_error': mse, 'True_class': test_y})
+
+pred_y = [1 if e > threshold_fixed else 0 for e in error_df.Reconstruction_error.values]
+conf_matrix = confusion_matrix(error_df.True_class, pred_y)
+
+plt.figure(figsize=(12, 12))
+sns.heatmap(conf_matrix, xticklabels=LABELS, yticklabels=LABELS, annot=True, fmt="d")
+plt.title("Confusion matrix")
+plt.ylabel('True class')
+plt.xlabel('Predicted class')
+plt.show()
