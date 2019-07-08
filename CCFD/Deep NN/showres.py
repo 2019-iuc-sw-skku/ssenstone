@@ -37,7 +37,7 @@ pred_y = [1 if e > threshold_fixed else 0 for e in error_df.Reconstruction_error
 conf_matrix = confusion_matrix(error_df.True_class, pred_y)
 
 plt.figure(figsize=(12, 12))
-sns.heatmap(conf_matrix, xticklabels=LABELS, yticklabels=LABELS, annot=True, fmt="d");
+sns.heatmap(conf_matrix, xticklabels=LABELS, yticklabels=LABELS, annot=True, fmt="d")
 plt.title("Confusion matrix")
 plt.ylabel('True class')
 plt.xlabel('Predicted class')
