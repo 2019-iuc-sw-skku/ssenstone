@@ -1,4 +1,5 @@
 import sys
+import server
 from PyQt5.QtWidgets import *
 
 class ServerGUI(QWidget):
@@ -115,11 +116,14 @@ class ServerGUI(QWidget):
             self.button.setText('Stop')
 
             # 서버 시작작업
+            serverobj = server.run_server(('localhost', 1234), )
 
         elif self.button.text() == 'Stop':
             self.button.setText('Start')
 
             # 서버 중지작업
+            serverobj.shutdown()
+            serverobj.server_close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
