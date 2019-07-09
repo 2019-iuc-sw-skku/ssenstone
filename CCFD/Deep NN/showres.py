@@ -26,7 +26,7 @@ test_x = test_x.drop(['Class'], axis=1)
 train_x = train_x.values
 test_x = test_x.values
 
-autoencoder = load_model('fraud_dl.cp')
+autoencoder = load_model('./CCFD/models/fraud_dl.h5')
 threshold_fixed = 5
 
 test_x_predictions = autoencoder.predict(test_x)
