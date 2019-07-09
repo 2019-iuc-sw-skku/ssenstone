@@ -14,8 +14,7 @@ class ServerGUI(QWidget):
         grid = QGridLayout()
 
         grid.addWidget(self.numOfModel(), 0, 0)
-        grid.addWidget(self.labeledData(), 1, 0)
-        grid.addWidget(self.log(), 2, 0)
+        grid.addWidget(self.log(), 1, 0)
         self.setLayout(grid)
 
         self.show()
@@ -66,39 +65,16 @@ class ServerGUI(QWidget):
         return groupbox
 
     def btn1Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
+        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav)")
         self.le1.setText(fname[0])
 
     def btn2Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
+        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav)")
         self.le2.setText(fname[0])
 
     def btn3Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
+        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav)")
         self.le3.setText(fname[0])
-
-
-# Saving location of sorted labeled data란을 구성하는 함수입니다.
-
-    def labeledData(self):
-        groupbox = QGroupBox('Saving location of sorted labeled data')
-
-        grid = QGridLayout()
-
-        self.ql = QLineEdit("", self)
-        grid.addWidget(self.ql, 0, 0)
-        btn = QPushButton("Browse..", self)
-        grid.addWidget(btn, 0, 1)
-        btn.clicked.connect(self.labeledDataButton)
-
-        groupbox.setLayout(grid)
-
-        return groupbox
-
-    def labeledDataButton(self):
-        fname = QFileDialog.getSaveFileName(self, "Save File", ".", "csv(*.csv)")
-        self.ql.setText(fname[0])
-
 
 # Server log란을 구성하는 함수입니다.
 
