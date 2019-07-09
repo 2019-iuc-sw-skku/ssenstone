@@ -23,7 +23,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
 
         if 'Class' in df.columns:
             print('labeled data')
-            if os.path.isfile("labeleddagit ta.csv"):
+            if os.path.isfile("labeleddata.csv"):
                 df.to_csv("labeleddata.csv", mode = 'a', header = False, index = False)
             else:
                 df.to_csv("labeleddata.csv", mode = 'w', index = False)
