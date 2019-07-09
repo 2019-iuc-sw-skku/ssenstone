@@ -1,6 +1,7 @@
 import sys
 import server
 from PyQt5.QtWidgets import *
+from PyQt5 import QtCore
 
 class ServerGUI(QWidget):
     def __init__(self):
@@ -129,14 +130,20 @@ class ServerGUI(QWidget):
                 modelnamelist.append(self.cb2.currentText())
                 modelnamelist.append(self.cb3.currentText())
 
-            serverobj = server.run_server(('localhost', 1234), pathlist, modelnamelist, 2)
+            self.serverthread = server.run_server(('localhost', 1234), pathlist, modelnamelist, 1)
 
         elif self.button.text() == 'Stop':
+            
+            # 서버 중지작업
+            self.serverthread.stop()
             self.button.setText('Start')
 
-            # 서버 중지작업
-            serverobj.shutdown()
-            serverobj.server_close()
+
+class Stream(QtCore.QObject):
+    new_text = QtCore.pyqtSignal(str)
+
+    def write(self, text):
+        self.new_text.emit(str(text))
 
 
 if __name__ == "__main__":
