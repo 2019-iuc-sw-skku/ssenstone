@@ -41,8 +41,8 @@ def throwdata(datatype, random_index):
 
 for i in range(0, DATA_AMOUNT):
     random_index = get_index(i)
-    data_type = random.choice(['labeled','unlabeled'])
-#    data_type = 'unlabeled'
+#    data_type = random.choice(['labeled','unlabeled'])
+    data_type = 'unlabeled'
     
     print('transmission ' + str(i) + ' : Data no.' + str(random_index) + ', Data type : ' + data_type)
     
@@ -52,8 +52,9 @@ for i in range(0, DATA_AMOUNT):
         print("No received data")
         continue
     
-    ans = int(str(ans, 'utf8'))
-    if data.iloc[random_index][30] != ans:
-        print(f"Wrong answer! True = {data.iloc[random_index]['Class']}, Predicted = {ans}")
+    ans = str(ans, 'utf8')
+    print('recieved: %s' %ans)
+    if data.iloc[random_index][30] != int(ans[0]):
+        print(f"Wrong answer! True = {data.iloc[random_index]['Class']}, Predicted = {ans[0]}")
     else:
         print("Correct answer")

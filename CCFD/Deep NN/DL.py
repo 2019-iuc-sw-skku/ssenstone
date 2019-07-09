@@ -21,8 +21,8 @@ normal_df = df[df.Class == 0]
 fraud_df = df[df.Class == 1]
 
 df_norm = df
-df_norm['Time'] = StandardScaler().fit_transform(df_norm['Time'].values.reshape(-1, 1))
-df_norm['Amount'] = StandardScaler().fit_transform(df_norm['Amount'].values.reshape(-1, 1))
+#df_norm['Time'] = StandardScaler().fit_transform(df_norm['Time'].values.reshape(-1, 1))
+#df_norm['Amount'] = StandardScaler().fit_transform(df_norm['Amount'].values.reshape(-1, 1))
 
 train_x, test_x = train_test_split(df_norm, test_size=TEST_PCT, random_state=RANDOM_SEED)
 train_x = train_x[train_x.Class == 0]
@@ -53,7 +53,7 @@ AutoEncoderModel = Model(inputs=input_layer, outputs=Decoder3)
 
 AutoEncoderModel.compile(metrics=['accuracy'], loss='mean_squared_error', optimizer='adam')
 
-cp = ModelCheckpoint(filepath="fraud_dl.cp", save_best_only=True)
+cp = ModelCheckpoint(filepath="./CCFD/models/fraud_dl.h5", save_best_only=True)
 
 tb = TensorBoard(log_dir='./dllogs', write_graph=True, write_images=True)
 
