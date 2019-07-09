@@ -20,13 +20,13 @@ class ServerGUI(QWidget):
 
         self.show()
 
-# Browse Models란을 구성하는 함수입니다.
-
-# 해야할일
-# 1. Number of Model에 따라서
-# 밑에 파일경로를 입력받는 란의 개수가 조절되게 끔 만들어야 함.
 
     def numOfModel(self):
+        '''Browse Models란을 구성하는 함수입니다.
+
+        해야할일
+        1. Number of Model에 따라서
+        밑에 파일경로를 입력받는 란의 개수가 조절되게 끔 만들어야 함.'''
         groupbox = QGroupBox('Browse Models')
 
         grid = QGridLayout()
@@ -88,20 +88,20 @@ class ServerGUI(QWidget):
         fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav);;all files(*.*)")
         self.le3.setText(fname[0])
 
-# Server log란을 구성하는 함수입니다.
-
-# 해야할 일
-# 1. Start를 누르면 서버가 시작, Stop을 누르면 서버가 중지되게끔 
-# serverHandle을 수정해야합니다.
-# 2. TextBrowser에 log가 업데이트 되도록 해야합니다.
 
     def log(self):
+        '''Server log란을 구성하는 함수입니다.
+
+        해야할 일
+        1. Start를 누르면 서버가 시작, Stop을 누르면 서버가 중지되게끔 
+        serverHandle을 수정해야합니다.
+        2. TextBrowser에 log가 업데이트 되도록 해야합니다.'''
         groupbox = QGroupBox('Server log')
 
         grid = QGridLayout()
 
         self.button = QPushButton("Start", self)
-        self.button.clicked.connect(self.serverHandle)
+        self.button.clicked.connect(self.server_handle)
         grid.addWidget(self.button, 0, 0)
 
         self.logtext = QTextBrowser()
@@ -111,14 +111,11 @@ class ServerGUI(QWidget):
         groupbox.setLayout(grid)
         return groupbox
 
-    def serverHandle(self):
+    def server_handle(self):
         if self.button.text() == 'Start':
             self.button.setText('Stop')
 
             # 서버 시작작업
-<<<<<<< HEAD
-            serverobj = server.run_server(('localhost', 1234), )
-=======
             pathlist = []
             pathlist.append(self.le1.text())
 
@@ -133,7 +130,6 @@ class ServerGUI(QWidget):
                 modelnamelist.append(self.cb3.currentText())
 
             serverobj = server.run_server(('localhost', 1234), pathlist, modelnamelist, 2)
->>>>>>> bbd06b915ebba3bdb88f708a16e4d0112d795111
 
         elif self.button.text() == 'Stop':
             self.button.setText('Start')
@@ -141,6 +137,7 @@ class ServerGUI(QWidget):
             # 서버 중지작업
             serverobj.shutdown()
             serverobj.server_close()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
