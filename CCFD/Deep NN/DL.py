@@ -53,7 +53,7 @@ AutoEncoderModel = Model(inputs=input_layer, outputs=Decoder3)
 
 AutoEncoderModel.compile(metrics=['accuracy'], loss='mean_squared_error', optimizer='adam')
 
-cp = ModelCheckpoint(filepath="fraud_dl.h5", save_best_only=True)
+cp = ModelCheckpoint(filepath="./CCFD/models/fraud_dl.h5", save_best_only=True)
 
 tb = TensorBoard(log_dir='./dllogs', write_graph=True, write_images=True)
 
