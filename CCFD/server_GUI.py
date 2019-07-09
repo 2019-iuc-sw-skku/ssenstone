@@ -76,15 +76,15 @@ class ServerGUI(QWidget):
         return groupbox
 
     def btn1Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav)")
+        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav);;all files(*.*)")
         self.le1.setText(fname[0])
 
     def btn2Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav)")
+        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav);;all files(*.*)")
         self.le2.setText(fname[0])
 
     def btn3Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav)")
+        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav);;all files(*.*)")
         self.le3.setText(fname[0])
 
 # Server log란을 구성하는 함수입니다.
