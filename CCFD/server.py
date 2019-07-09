@@ -78,4 +78,4 @@ def runServer(model_paths, model_names, pass_score):
     server.start()
 
 if __name__=='__main__':
-    runServer(['./model1.sav', './fraud_dl.h5'], ['Random forest', 'Autoencoded Deep Learning'], 2)
+    runServer(['./CCFD/models/model1.sav', './CCFD/models/fraud_dl.h5'], ['Random forest', 'Autoencoded Deep Learning'], 2)
