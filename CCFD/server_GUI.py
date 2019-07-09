@@ -8,7 +8,7 @@ class ServerGUI(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setGeometry(800, 200, 600, 600)
+        self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle("Server")
         
         grid = QGridLayout()
@@ -47,14 +47,25 @@ class ServerGUI(QWidget):
         
         for i in [0, 1, 2]:
             grid.addWidget(QLabel('Model ' + str(i + 1), self), i + 2, 0)
-            
-        grid.addWidget(self.le1, 2, 1)
-        grid.addWidget(self.le2, 3, 1)
-        grid.addWidget(self.le3, 4, 1)
 
-        grid.addWidget(btn1, 2, 2)
-        grid.addWidget(btn2, 3, 2)
-        grid.addWidget(btn3, 4, 2)
+        cb1 = QComboBox(self)
+        cb1.addItems(['Random forest', 'Autoencoded Deep Learning'])
+        cb2 = QComboBox(self)
+        cb2.addItems(['Random forest', 'Autoencoded Deep Learning'])
+        cb3 = QComboBox(self)
+        cb3.addItems(['Random forest', 'Autoencoded Deep Learning'])
+            
+        grid.addWidget(cb1, 2, 1)
+        grid.addWidget(cb2, 3, 1)
+        grid.addWidget(cb3, 4, 1)
+
+        grid.addWidget(self.le1, 2, 2)
+        grid.addWidget(self.le2, 3, 2)
+        grid.addWidget(self.le3, 4, 2)
+
+        grid.addWidget(btn1, 2, 3)
+        grid.addWidget(btn2, 3, 3)
+        grid.addWidget(btn3, 4, 3)
 
         btn1.clicked.connect(self.btn1Clicked)
         btn2.clicked.connect(self.btn2Clicked)
