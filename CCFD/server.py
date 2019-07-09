@@ -6,6 +6,7 @@ Receive data and recognize it using models
 import pickle
 import socketserver
 import warnings
+import threading
 
 import numpy as np
 import pandas as pd
@@ -64,13 +65,38 @@ class ThreadedServer(socketserver.ThreadingTCPServer):
         Start server and serve forever.
         '''
         print("------- Server start -------")
-        try:
-            self.serve_forever()
-        except:
-            print("-------- Server end ---------")
+        self.serve_forever()
+        print("-------- Server end ---------")
 
+class StoppableThread(threading.Thread):
+    '''
+    Thread class with a stop() method.
+    The thread will stop for the stop() call
+    '''
 
-def run_server(listen_addr, model_paths, model_names, pass_score=1):
+    def __init__(self, target, args):
+        '''
+        :parameters
+            target: target function
+            args: arguments as tuple
+        '''
+        super(StoppableThread, self).__init__()
+        self._stop_event = threading.Event()
+        self.server: ThreadedServer
+        self.target = target
+        self.args = args
+
+    def run(self):
+        self.server = self.target(*self.args)
+        self.server.start()
+
+    def stop(self):
+        self._stop_event.set()
+        self.server.shutdown()
+
+    def stopped(self):
+        return self._stop_event.is_set()
+def __set_server(listen_addr, model_paths, model_names, pass_score):
     '''
     Run server using path to model(s)
 
@@ -89,8 +115,13 @@ def run_server(listen_addr, model_paths, model_names, pass_score=1):
 
     server.pass_score = pass_score
     server.model_names = model_names
-    server.start()
+#    server.start()
     return server
+
+def run_server(listen_addr, model_paths, model_names, pass_score=1):
+    thread = StoppableThread(target=__set_server, args=(listen_addr, model_paths, model_names, pass_score))
+    thread.start()
+    return thread
 
 if __name__ == '__main__':
     run_server((HOST, PORT),
