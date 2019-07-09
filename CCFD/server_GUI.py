@@ -1,4 +1,5 @@
 import sys
+import server
 from PyQt5.QtWidgets import *
 
 class ServerGUI(QWidget):
@@ -30,12 +31,12 @@ class ServerGUI(QWidget):
 
         grid = QGridLayout()
 
-        cb = QComboBox(self)
-        cb.addItems(['1', '3'])
+        self.cb = QComboBox(self)
+        self.cb.addItems(['1', '3'])
         
 
         grid.addWidget(QLabel("Number of model", self), 0, 0)
-        grid.addWidget(cb, 1, 0)
+        grid.addWidget(self.cb, 1, 0)
 
         self.le1 = QLineEdit("", self)
         self.le2 = QLineEdit("", self)
@@ -48,16 +49,16 @@ class ServerGUI(QWidget):
         for i in [0, 1, 2]:
             grid.addWidget(QLabel('Model ' + str(i + 1), self), i + 2, 0)
 
-        cb1 = QComboBox(self)
-        cb1.addItems(['Random forest', 'Autoencoded Deep Learning'])
-        cb2 = QComboBox(self)
-        cb2.addItems(['Random forest', 'Autoencoded Deep Learning'])
-        cb3 = QComboBox(self)
-        cb3.addItems(['Random forest', 'Autoencoded Deep Learning'])
+        self.cb1 = QComboBox(self)
+        self.cb1.addItems(['Random forest', 'Autoencoded Deep Learning'])
+        self.cb2 = QComboBox(self)
+        self.cb2.addItems(['Random forest', 'Autoencoded Deep Learning'])
+        self.cb3 = QComboBox(self)
+        self.cb3.addItems(['Random forest', 'Autoencoded Deep Learning'])
             
-        grid.addWidget(cb1, 2, 1)
-        grid.addWidget(cb2, 3, 1)
-        grid.addWidget(cb3, 4, 1)
+        grid.addWidget(self.cb1, 2, 1)
+        grid.addWidget(self.cb2, 3, 1)
+        grid.addWidget(self.cb3, 4, 1)
 
         grid.addWidget(self.le1, 2, 2)
         grid.addWidget(self.le2, 3, 2)
@@ -115,11 +116,27 @@ class ServerGUI(QWidget):
             self.button.setText('Stop')
 
             # 서버 시작작업
+            pathlist = []
+            pathlist.append(self.le1.text())
+
+            modelnamelist = []
+            modelnamelist.append(self.cb1.currentText())
+
+            if self.cb.currentText() == '3':
+                pathlist.append(self.le2.text())
+                pathlist.append(self.le3.text())
+
+                modelnamelist.append(self.cb2.currentText())
+                modelnamelist.append(self.cb3.currentText())
+
+            serverobj = server.run_server(('localhost', 1234), pathlist, modelnamelist, 2)
 
         elif self.button.text() == 'Stop':
             self.button.setText('Start')
 
             # 서버 중지작업
+            serverobj.shutdown()
+            serverobj.server_close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
