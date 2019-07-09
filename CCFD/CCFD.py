@@ -1,6 +1,5 @@
 import pickle
 import matplotlib.pyplot as plt
-import mglearn
 import pandas as pd
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
