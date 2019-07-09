@@ -1,3 +1,9 @@
+'''
+Client program
+
+send random rows in creditcard.csv file to server
+recieve and compare answer to true value
+'''
 import random
 import socket
 import warnings
@@ -12,49 +18,43 @@ HOST = 'localhost'
 PORT = 1234
 DATA_AMOUNT = 20
 
-data = pd.read_csv("./creditcard.csv")
-data_nolabel = data
-data_nolabel = data_nolabel.drop(columns='Class')
+DATA = pd.read_csv("./creditcard.csv")
+DATA_NOLABEL = DATA
+DATA_NOLABEL = DATA_NOLABEL.drop(columns='Class')
 
-fraud = fraud_index.fraud
-random.shuffle(fraud)
+FRAUD = fraud_index.fraud
+random.shuffle(FRAUD)
+
 
 def get_index(num):
+    '''
+    Get random index
+    '''
     if num % 2 == 0 and num < 984:
-        return fraud.pop()
+        return FRAUD.pop()
     else:
         return random.randrange(0, 284807)
 
-def throwdata(datatype, random_index):
+def throwdata(index):
+    '''
+    Send data to server
+    '''
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect((HOST, PORT))
-
-        if datatype == 'labeled':
-            data_string = data[random_index : random_index + 1].to_json()
-            sock.sendall(data_string.encode())
-            return
-        else:
-            data_string = data_nolabel[random_index : random_index + 1].to_json()
-            sock.sendall(data_string.encode())
-            return sock.recv(1024)
+        data_string = DATA_NOLABEL[index : index + 1].to_json()
+        sock.sendall(data_string.encode())
+        return sock.recv(1024)
 
 
 for i in range(0, DATA_AMOUNT):
     random_index = get_index(i)
-#    data_type = random.choice(['labeled','unlabeled'])
-    data_type = 'unlabeled'
-    
-    print('transmission ' + str(i) + ' : Data no.' + str(random_index) + ', Data type : ' + data_type)
-    
-    ans = throwdata(data_type, random_index)
+    print('transmission ' + str(i) +
+          ' : Data no.' + str(random_index))
+    ans = throwdata(random_index)
 
-    if data_type == 'labeled':
-        print("No received data")
-        continue
-    
     ans = str(ans, 'utf8')
     print('recieved: %s' %ans)
-    if data.iloc[random_index][30] != int(ans[0]):
-        print(f"Wrong answer! True = {data.iloc[random_index]['Class']}, Predicted = {ans[0]}")
+    if DATA.iloc[random_index][30] != int(ans[0]):
+        print(f"Wrong answer! True = {DATA.iloc[random_index]['Class']}, Predicted = {ans[0]}")
     else:
         print("Correct answer")
