@@ -90,6 +90,7 @@ def run_server(listen_addr, model_paths, model_names, pass_score=1):
     server.pass_score = pass_score
     server.model_names = model_names
     server.start()
+    return server
 
 if __name__ == '__main__':
     run_server((HOST, PORT),
