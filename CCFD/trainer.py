@@ -1,3 +1,10 @@
+'''
+분류기 프로그램.
+현재 지원되는 모델
+    Random Forest
+    Autoencoder Deep Learning (Keras)
+'''
+
 import pickle
 
 import keras
@@ -6,13 +13,12 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from keras import regularizers
-from keras.callbacks import ModelCheckpoint, TensorBoard
+from keras.callbacks import ModelCheckpoint
 from keras.layers import Dense, Input
 from keras.models import Model
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (accuracy_score, classification_report,
-                             confusion_matrix)
-from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 from model_names import ModelNames
