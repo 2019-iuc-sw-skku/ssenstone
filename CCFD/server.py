@@ -43,7 +43,7 @@ class MyTcpHandler(socketserver.StreamRequestHandler):
                     if mse > 5:
                         score = score + 1
 
-                elif name == ModelNames.RANDOM_FOREST:
+                else:
                     if answer[0] == 0:
                         score = score + 1
 
@@ -113,7 +113,7 @@ def __set_server(listen_addr, model_paths, model_names, pass_score):
     '''
     server = ThreadedServer(listen_addr)
     for path in model_paths:
-        if path[-3:] == '.h5':    # if it's keras model, use keras-load_model
+        if model_names == ModelNames.AUTOENCODED_DEEP_LEARNING:    # if it's keras model, use keras-load_model
             server.model.append(load_model(path))
         else:                     # else it's pickle dumped model.
             server.model.append(pickle.load(open(path, 'rb')))
