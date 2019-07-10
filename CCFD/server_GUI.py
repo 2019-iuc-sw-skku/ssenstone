@@ -46,7 +46,7 @@ class ServerGUI(QWidget):
     def initUI(self):
         self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle("Server")
-        
+
         grid = QGridLayout()
 
         grid.addWidget(self.numOfModel(), 0, 0)
@@ -57,12 +57,8 @@ class ServerGUI(QWidget):
 
 
     def numOfModel(self):
-        '''Browse Models란을 구성하는 함수입니다.
-
-        해야할일
-        1. Number of Model에 따라서
-        밑에 파일경로를 입력받는 란의 개수가 조절되게 끔 만들어야 함.
-        1 추가. 1번 그냥 안하기로함
+        '''
+        Browse Models란을 구성하는 함수입니다.
         '''
         groupbox = QGroupBox('Browse Models')
 
@@ -70,13 +66,14 @@ class ServerGUI(QWidget):
 
         self.cb = QComboBox(self)
         self.cb.addItems(['1', '3'])
-        
+
         self.cb.currentIndexChanged.connect(self.numChanged)
 
         grid.addWidget(QLabel("Number of model", self), 0, 0)
         grid.addWidget(self.cb, 1, 0)
 
         self.le1 = QLineEdit("", self)
+        self.le1.setReadOnly(True)
         self.le2 = QLineEdit("", self)
         self.le2.setReadOnly(True)
         self.le3 = QLineEdit("", self)
@@ -88,24 +85,24 @@ class ServerGUI(QWidget):
 
         self.btn2.setDisabled(True)
         self.btn3.setDisabled(True)
-        
+
         for i in [0, 1, 2]:
             grid.addWidget(QLabel('Model ' + str(i + 1), self), i + 2, 0)
 
         self.cb1 = QComboBox(self)
-        self.cb1.addItems(['Random forest', 'Autoencoded Deep Learning'])
+        self.cb1.addItems(['Random forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Linear Regression'])
         self.cb1.currentIndexChanged.connect(self.cb1Changed)
 
         self.cb2 = QComboBox(self)
-        self.cb2.addItems(['Random forest', 'Autoencoded Deep Learning'])
+        self.cb2.addItems(['Random forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Linear Regression'])
         self.cb2.currentIndexChanged.connect(self.cb2Changed)
         self.cb2.setDisabled(True)
 
         self.cb3 = QComboBox(self)
-        self.cb3.addItems(['Random forest', 'Autoencoded Deep Learning'])
+        self.cb3.addItems(['Random forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Linear Regression'])
         self.cb3.currentIndexChanged.connect(self.cb3Changed)
         self.cb3.setDisabled(True)
-            
+
         grid.addWidget(self.cb1, 2, 1)
         grid.addWidget(self.cb2, 3, 1)
         grid.addWidget(self.cb3, 4, 1)
@@ -130,9 +127,6 @@ class ServerGUI(QWidget):
         if self.cb.currentText() == '1':
             self.cb2.setDisabled(True)
             self.cb3.setDisabled(True)
-            
-            self.le2.setReadOnly(True)
-            self.le3.setReadOnly(True)
 
             self.btn2.setDisabled(True)
             self.btn3.setDisabled(True)
@@ -140,15 +134,12 @@ class ServerGUI(QWidget):
             self.cb2.setDisabled(False)
             self.cb3.setDisabled(False)
 
-            self.le2.setReadOnly(False)
-            self.le3.setReadOnly(False)
-
             self.btn2.setDisabled(False)
             self.btn3.setDisabled(False)
 
     def cb1Changed(self):
         self.le1.clear()
-        
+
     def cb2Changed(self):
         self.le2.clear()
 
@@ -156,33 +147,30 @@ class ServerGUI(QWidget):
         self.le3.clear()
 
     def btn1Clicked(self):
-        if self.cb1.currentText() == 'Random forest':
-            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
-        elif self.cb1.currentText() == 'Autoencoded Deep Learning':
+        if self.cb1.currentText() == 'Autoencoded Deep Learning':
             fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "h5(*.h5)")
+        else:
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
         self.le1.setText(fname[0])
 
     def btn2Clicked(self):
-        if self.cb2.currentText() == 'Random forest':
-            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
-        elif self.cb2.currentText() == 'Autoencoded Deep Learning':
+        if self.cb2.currentText() == 'Autoencoded Deep Learning':
             fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "h5(*.h5)")
+        else:
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
         self.le2.setText(fname[0])
 
     def btn3Clicked(self):
-        if self.cb3.currentText() == 'Random forest':
-            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
-        elif self.cb3.currentText() == 'Autoencoded Deep Learning':
+        if self.cb3.currentText() == 'Autoencoded Deep Learning':
             fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "h5(*.h5)")
+        else:
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
         self.le3.setText(fname[0])
 
 
     def log(self):
         '''
         Server log란을 구성하는 함수입니다.
-
-        해야할 일
-        log출력부분 줄간격조정을 해야합니다.
         '''
         groupbox = QGroupBox('Server log')
 
@@ -205,7 +193,7 @@ class ServerGUI(QWidget):
                 pathlist = []
                 if self.le1.text() == '':
                     raise ModelNumberError()
-                
+
                 pathlist.append(self.le1.text())
 
                 modelnamelist = []
@@ -239,7 +227,7 @@ class ServerGUI(QWidget):
                 msgbox.exec()
 
         elif self.button.text() == 'Stop':
-            
+
             # 서버 중지작업
             self.serverthread.stop()
             self._stdout.stop()
