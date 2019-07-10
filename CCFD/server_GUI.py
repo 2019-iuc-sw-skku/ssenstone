@@ -91,16 +91,16 @@ class ServerGUI(QWidget):
             grid.addWidget(QLabel('Model ' + str(i + 1), self), i + 2, 0)
 
         self.cb1 = QComboBox(self)
-        self.cb1.addItems(['Random forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Linear Regression'])
+        self.cb1.addItems(['Random forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Logistic Regression'])
         self.cb1.currentIndexChanged.connect(self.cb1Changed)
 
         self.cb2 = QComboBox(self)
-        self.cb2.addItems(['Random forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Linear Regression'])
+        self.cb2.addItems(['Random forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Logistic Regression'])
         self.cb2.currentIndexChanged.connect(self.cb2Changed)
         self.cb2.setDisabled(True)
 
         self.cb3 = QComboBox(self)
-        self.cb3.addItems(['Random forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Linear Regression'])
+        self.cb3.addItems(['Random forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Logistic Regression'])
         self.cb3.currentIndexChanged.connect(self.cb3Changed)
         self.cb3.setDisabled(True)
 
