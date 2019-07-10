@@ -16,11 +16,12 @@ from keras import regularizers
 from keras.callbacks import ModelCheckpoint
 from keras.layers import Dense, Input
 from keras.models import Model
-from sklearn.ensemble import RandomForestClassifier
+from sklearn import naive_bayes, svm
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-
+from sklearn.linear_model import LogisticRegression
 from model_names import ModelNames
 
 
@@ -52,7 +53,24 @@ class Trainer:
 
                 example:
                     {'n_estimators': 100}
-                
+
+                Logistic Regression:
+                    see sklearn.linear_model.LogisticRegression
+
+                Adaboost:
+                    see sklearn.ensemble.AdaBoostClassifier.
+
+                Naive Bayes(Bernoulli):
+                    see sklearn.naive_bayes.BernoulliNB
+
+                SVM:
+                    kernel = 'linear'
+                    see sklearn.svm.SVC
+                    
+                SVM with RBF kernel:
+                    kernel = 'rbf'
+                    see sklearn.svm.SVC
+
                 Deep Learning:
                     Required:
                         epochs - int: training trial number.
@@ -70,30 +88,60 @@ class Trainer:
         self.model_name = model_name
         df = pd.read_csv(self.fname)
         df = df.sample(frac=1)
-        normal_df = df[df['Class'] == 0]
-        fraud_df = df[df['Class'] == 1]
 
         df_norm = df
         df_norm['Time'] = StandardScaler().fit_transform(df_norm['Time'].values.reshape(-1, 1))
         df_norm['Amount'] = StandardScaler().fit_transform(df_norm['Amount'].values.reshape(-1, 1))
 
         
+        new_df = df_norm.sample(frac=1, random_state=self.RSEED)
+        
+        x = new_df.drop('Class', axis=1)
+        y = new_df['Class']
+        x, _, y, _ = train_test_split(x, y, train_size=train_pct)
+
+        train_x = x.values
+        train_y = y.values
+
         print("Train start...")
         if model_name == ModelNames.RANDOM_FOREST:
             
-            new_df = df_norm.sample(frac=1, random_state=self.RSEED)
-            
-            x = new_df.drop('Class', axis=1)
-            y = new_df['Class']
-            x, _, y, _ = train_test_split(x, y, train_size=train_pct)
-            train_x = x.values
-            train_y = y.values
             rf = RandomForestClassifier(**properties, random_state=self.RSEED)
             rf.fit(train_x, train_y)
 
             pickle.dump(rf, open(output_path, "wb"))
 
             self.model = rf
+        
+        elif model_name == ModelNames.LOGISTIC_REGRESSION:
+            lr = LogisticRegression(**properties, random_state=self.RSEED)
+            lr.fit(train_x, train_y)
+            pickle.dump(lr, open(output_path, "wb"))
+            self.model = lr
+
+        elif model_name == ModelNames.ADAPTIVE_BOOST:
+            ada = AdaBoostClassifier(**properties, random_state=self.RSEED)
+            ada.fit(train_x, train_y)
+            pickle.dump(ada, open(output_path, "wb"))
+            self.model = ada
+
+        elif model_name == ModelNames.NAIVE_BAYES:
+            nb = naive_bayes.BernoulliNB(**properties)
+            nb.fit(train_x, train_y)
+            pickle.dump(nb, open(output_path, "wb"))
+            self.model = nb
+
+        elif model_name == ModelNames.SVM:
+            clf = svm.SVC(kernel='linear', random_state=self.RSEED)
+            clf.fit(train_x, train_y)
+            pickle.dump(clf, open(output_path, "wb"))
+            self.model = clf
+
+        elif model_name == ModelNames.SVM_RBF_KERNEL:
+            clf = svm.SVC(kernel='rbf', random_state=self.RSEED)
+            clf.fit(train_x, train_y)
+            pickle.dump(clf, open(output_path, "wb"))
+            self.model = clf
 
         elif model_name == ModelNames.AUTOENCODED_DEEP_LEARNING:
 
