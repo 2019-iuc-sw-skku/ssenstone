@@ -1,11 +1,12 @@
 import pickle
 import matplotlib.pyplot as plt
+import mglearn
 import pandas as pd
 import seaborn as sns
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.model_selection import cross_val_score, train_test_split
-from sklearn.preprocessing import StandardScaler
 
 class CCFDT:
     def __init__(self, RSEED, TESTP, fname ):
@@ -38,24 +39,42 @@ class CCFDT:
         train_x=sc.fit_transform(train_x)
         test_x=sc.transform(test_x)
 
-        print("Train start...")
-        rf = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=self.RSEED)
-        rf.fit(train_x, train_y)
-        training_score = cross_val_score(rf, train_x, train_y, cv=5)
+        print("Euclidean Train start...")
+        
+        best_accuracy=0.0000
+        best_num=1
+        
+        #Euclidean
+        for i in range(1,203):
+            num=i
+            KNN_Euclidean=KNeighborsClassifier(n_neighbors=i)
+            KNN_Euclidean.fit(train_x,train_y)
+            TestEuclideanpred=KNN_Euclidean.predict(test_x)
+            score=accuracy_score(test_y, TestEuclideanpred)
+            #print("Euclidean dis(k)=", i, 'accuracy', score)
+            if (score>best_accuracy):
+                best_accuracy=score
+                best_num=i
+        
+        KNN_Euclidean=KNeighborsClassfier(n_neighbors=best_num)
+        KNN_Euclidean.fit(train_x,train_y)
+        TestEuclideanpred=KNN_Euclidean.predict(test_x)
+        
+        training_score = cross_val_score(KNN_Euclidean, train_x, train_y, cv=5)
+        
+        training_score = cross_val_score(KNN_Euclidean, train_x, train_y, cv=5)
 
         print("Training score", training_score)
 
-        pickle.dump(rf, open("./CCFD/models/model" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(KNN_Euclidean, open("./model_KNN_Eu" + str(self.model_set) + ".sav", "wb"))
 
-        predicted = rf.predict(test_x)
-        accuracy = accuracy_score(test_y, predicted)
-        report=classification_report(test_y, predicted)
+        accuracy = accuracy_score(test_y, TestEuclideanpred)
+        report=classification_report(test_y, TestEuclideanpred)
 
-        print(f'Out-of-bag score estimate: {rf.oob_score_:.3}')
         print(f'Mean accuracy score: {accuracy:.3}')
         print(report)
 
-        cm = pd.DataFrame(confusion_matrix(test_y, predicted))
+        cm = pd.DataFrame(confusion_matrix(test_y, TestEuclideanpred))
         sns.heatmap(cm, annot=True)
    
     def show(self):
@@ -63,10 +82,10 @@ class CCFDT:
      
     def set_modelnum(self,num):
         self.model_set = num
-
+    
     def show_pickle(self):
         data_list = []
-        with open("./CCFD/models/model" + str(self.model_set) + ".sav",'rb') as FL:
+        with open("./model_KNN_Eu" + str(self.model_set) + ".sav",'rb') as FL:
             data=[]
             while(True):
                 try: 
