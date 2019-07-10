@@ -7,6 +7,7 @@ import pickle
 import socketserver
 import threading
 import warnings
+import time
 
 import numpy as np
 import pandas as pd
@@ -28,6 +29,8 @@ class MyTcpHandler(socketserver.StreamRequestHandler):
     '''
     def handle(self):
         global DEFAULT_GRAPH
+        now = time.localtime()
+        print('%04d-%02d-%02d %02d:%02d:%02d' % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec), end='')
         print('[%s] is connected' %self.client_address[0])
         data = self.request.recv(1024)
         nparr = pd.read_json(data.decode()).as_matrix()
