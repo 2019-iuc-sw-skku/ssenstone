@@ -108,12 +108,14 @@ def __set_server(listen_addr, model_paths, model_names, pass_score):
     :parameter
         model_paths(array): array of path to model(s).
         model_names(array): array of enumerated value of name of model(s). see model_names.py
+                example:
+                    RandomForest, DeepLearning -> [ModelNames(0), ModelNames(1)]
         pass_score(int): threshold for multi model input.
                          Server recognize it is normal when model passes >= pass_score
     '''
     server = ThreadedServer(listen_addr)
-    for path in model_paths:
-        if model_names == ModelNames.AUTOENCODED_DEEP_LEARNING:    # if it's keras model, use keras-load_model
+    for path, model_name in zip(model_paths, model_names):
+        if model_name == ModelNames.AUTOENCODED_DEEP_LEARNING:    # if it's keras model, use keras-load_model
             server.model.append(load_model(path))
         else:                     # else it's pickle dumped model.
             server.model.append(pickle.load(open(path, 'rb')))
