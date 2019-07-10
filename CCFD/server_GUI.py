@@ -2,6 +2,7 @@ import sys
 import server
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
+from model_names import ModelNames
 
 class ServerGUI(QWidget):
     def __init__(self):
@@ -121,14 +122,14 @@ class ServerGUI(QWidget):
             pathlist.append(self.le1.text())
 
             modelnamelist = []
-            modelnamelist.append(self.cb1.currentText())
+            modelnamelist.append(self.cb1.currentIndex())
 
             if self.cb.currentText() == '3':
                 pathlist.append(self.le2.text())
                 pathlist.append(self.le3.text())
 
-                modelnamelist.append(self.cb2.currentText())
-                modelnamelist.append(self.cb3.currentText())
+                modelnamelist.append(self.cb2.currentIndex())
+                modelnamelist.append(self.cb3.currentIndex())
 
             self.serverthread = server.run_server(('localhost', 1234), pathlist, modelnamelist, 1)
 

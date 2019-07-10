@@ -1,13 +1,11 @@
-import keras
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import tensorflow as tf
 from keras import regularizers
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.layers import Dense, Input
-from keras.models import Model, load_model
+from keras.models import Model
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
