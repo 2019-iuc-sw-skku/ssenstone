@@ -2,11 +2,9 @@ import pickle
 import keras
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
-import random
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix
-from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import cross_val_score
 
 class CCFDT:
     def __init__(self, filepath, random_state=None):
@@ -21,7 +19,7 @@ class CCFDT:
 
     def training(self, output_path, model_name, properties):
         '''
-        
+
         '''
         df = pd.read_csv(self.fname)
         df = df.sample(frac=1)
