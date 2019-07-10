@@ -3,11 +3,45 @@ import server
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
 
+HOST = 'localhost'
+PORT = 1234
+
+class ModelNumberError(Exception):
+    pass
+
+class StdoutRedirect(QtCore.QObject):
+    printOccur = QtCore.pyqtSignal(str, str, name="print")
+
+    def __init__(self, *param):
+        QtCore.QObject.__init__(self, None)
+        self.daemon = True
+        self.sysstdout = sys.stdout.write
+        self.sysstderr = sys.stderr.write
+
+    def stop(self):
+        sys.stdout.write = self.sysstdout
+        sys.stderr.write = self.sysstderr
+
+    def start(self):
+        sys.stdout.write = self.write
+        sys.stderr.write =  lambda msg : self.write(msg, color="red")
+
+    def write(self, s, color="black"):
+        sys.stdout.flush()
+        self.printOccur.emit(s, color)
+
 class ServerGUI(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent = None):
+        super(ServerGUI, self).__init__(parent)
+
+        self._stdout = StdoutRedirect()
+        self._stdout.printOccur.connect(lambda x : self._append_text(x))
 
         self.initUI()
+
+    def _append_text(self, msg):
+        self.logtext.append(msg)
+        QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
 
     def initUI(self):
         self.setGeometry(200, 200, 800, 600)
@@ -78,25 +112,34 @@ class ServerGUI(QWidget):
         return groupbox
 
     def btn1Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav);;all files(*.*)")
+        if self.cb1.currentText() == 'Random forest':
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
+        elif self.cb1.currentText() == 'Autoencoded Deep Learning':
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "h5(*.h5)")
         self.le1.setText(fname[0])
 
     def btn2Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav);;all files(*.*)")
+        if self.cb2.currentText() == 'Random forest':
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
+        elif self.cb2.currentText() == 'Autoencoded Deep Learning':
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "h5(*.h5)")
         self.le2.setText(fname[0])
 
     def btn3Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", ".", "sav(*.sav);;all files(*.*)")
+        if self.cb3.currentText() == 'Random forest':
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
+        elif self.cb3.currentText() ==  'Autoencoded Deep Learning':
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "h5(*.h5)")
         self.le3.setText(fname[0])
 
 
     def log(self):
-        '''Server log란을 구성하는 함수입니다.
+        '''
+        Server log란을 구성하는 함수입니다.
 
         해야할 일
-        1. Start를 누르면 서버가 시작, Stop을 누르면 서버가 중지되게끔 
-        serverHandle을 수정해야합니다.
-        2. TextBrowser에 log가 업데이트 되도록 해야합니다.'''
+        log출력부분 줄간격조정을 해야합니다.
+        '''
         groupbox = QGroupBox('Server log')
 
         grid = QGridLayout()
@@ -114,37 +157,49 @@ class ServerGUI(QWidget):
 
     def server_handle(self):
         if self.button.text() == 'Start':
-            self.button.setText('Stop')
+            try:
+                pathlist = []
+                if self.le1.text() == '':
+                    raise ModelNumberError()
+                
+                pathlist.append(self.le1.text())
 
-            # 서버 시작작업
-            pathlist = []
-            pathlist.append(self.le1.text())
+                modelnamelist = []
+                modelnamelist.append(self.cb1.currentText())
 
-            modelnamelist = []
-            modelnamelist.append(self.cb1.currentText())
+                if self.cb.currentText() == '3':
+                    if self.le2.text() == '' or self.le3.text() == '':
+                        raise ModelNumberError()
+                    pathlist.append(self.le2.text())
+                    pathlist.append(self.le3.text())
 
-            if self.cb.currentText() == '3':
-                pathlist.append(self.le2.text())
-                pathlist.append(self.le3.text())
+                    modelnamelist.append(self.cb2.currentText())
+                    modelnamelist.append(self.cb3.currentText())
 
-                modelnamelist.append(self.cb2.currentText())
-                modelnamelist.append(self.cb3.currentText())
+                    self.button.setText('Stop')
 
-            self.serverthread = server.run_server(('localhost', 1234), pathlist, modelnamelist, 1)
+                    self.logtext.clear()
+                    self._stdout.start()
+
+                    self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, 2)
+                else:
+                    self.button.setText('Stop')
+
+                    self.logtext.clear()
+                    self._stdout.start()
+
+                    self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, 1)
+            except ModelNumberError:
+                msgbox = QMessageBox()
+                msgbox.setText('Please select models correctly')
+                msgbox.exec()
 
         elif self.button.text() == 'Stop':
             
             # 서버 중지작업
             self.serverthread.stop()
+            self._stdout.stop()
             self.button.setText('Start')
-
-
-class Stream(QtCore.QObject):
-    new_text = QtCore.pyqtSignal(str)
-
-    def write(self, text):
-        self.new_text.emit(str(text))
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
