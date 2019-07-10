@@ -33,7 +33,7 @@ train_x = train_x.values
 test_x = test_x.values
 
 input_dimension = train_x.shape[1]
-nb_epoch = 100
+nb_epoch = 10
 batch_size = 128
 encoding_dimension = 32
 learning_rate = 0.0000001

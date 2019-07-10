@@ -198,19 +198,19 @@ class ServerGUI(QWidget):
                     raise ModelNumberError()
 
                 pathlist.append(self.le1.text())
-                modelnamelist.append(self.cb1.currentIndex())
-                
+                modelnamelist.append(ModelNames(self.cb1.currentIndex()))
+
                 if int(self.cb.currentText()) >= 2:
                     if self.le2.text() == '':
                         raise ModelNumberError()
                     pathlist.append(self.le2.text())
-                    modelnamelist.append(self.cb2.currentIndex())
+                    modelnamelist.append(ModelNames(self.cb2.currentIndex()))
                     
                 if int(self.cb.currentText()) >= 3:
                     if self.le3.text() == '':
                         raise ModelNumberError()
                     pathlist.append(self.le3.text())
-                    modelnamelist.append(self.cb3.currentIndex())
+                    modelnamelist.append(ModelNames(self.cb3.currentIndex()))
 
                 self.button.setText('Stop')
 
