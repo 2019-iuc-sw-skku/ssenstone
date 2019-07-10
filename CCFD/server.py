@@ -5,14 +5,16 @@ Receive data and recognize it using models
 '''
 import pickle
 import socketserver
-import warnings
 import threading
+import warnings
 import time
 
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 from keras.models import load_model
+
+from model_names import ModelNames
 
 warnings.filterwarnings("ignore")
 
@@ -36,12 +38,12 @@ class MyTcpHandler(socketserver.StreamRequestHandler):
         with DEFAULT_GRAPH.as_default():
             for model, name in zip(self.server.model, self.server.model_names):
                 answer = model.predict(nparr)
-                if name == 'Autoencoded Deep Learning':                        #keras deep learning
+                if name == ModelNames.AUTOENCODED_DEEP_LEARNING:                        #keras deep learning
                     mse = np.mean(np.power(nparr - answer, 2))
                     if mse > 5:
                         score = score + 1
 
-                elif name == 'Random forest':
+                elif name == ModelNames.RANDOM_FOREST:
                     if answer[0] == 0:
                         score = score + 1
 
@@ -104,10 +106,10 @@ def __set_server(listen_addr, model_paths, model_names, pass_score):
     Run server using path to model(s)
 
     :parameter
-        model_paths(array): array of path to model(s)
-        model_names(array): array of name of model(s)
+        model_paths(array): array of path to model(s).
+        model_names(array): array of enumerated value of name of model(s). see model_names.py
         pass_score(int): threshold for multi model input.
-                        Server recognize it is normal when model passes >= pass_score
+                         Server recognize it is normal when model passes >= pass_score
     '''
     server = ThreadedServer(listen_addr)
     for path in model_paths:
@@ -129,4 +131,4 @@ def run_server(listen_addr, model_paths, model_names, pass_score=1):
 if __name__ == '__main__':
     run_server((HOST, PORT),
                ['./CCFD/models/model1.sav', './CCFD/models/fraud_dl.h5'],
-               ['Random forest', 'Autoencoded Deep Learning'], 2)
+               [ModelNames.RANDOM_FOREST, ModelNames.AUTOENCODED_DEEP_LEARNING], 2)

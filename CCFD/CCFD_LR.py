@@ -64,7 +64,7 @@ class CCFDT:
 
     def show_pickle(self):
         data_list = []
-        with open("./model" + str(self.model_set) + ".sav",'rb') as FL:
+        with open("./model_Lr" + str(self.model_set) + ".sav",'rb') as FL:
             data=[]
             while(True):
                 try: 
