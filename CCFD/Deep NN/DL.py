@@ -1,13 +1,11 @@
-import keras
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import tensorflow as tf
 from keras import regularizers
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.layers import Dense, Input
-from keras.models import Model, load_model
+from keras.models import Model
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -21,8 +19,8 @@ normal_df = df[df.Class == 0]
 fraud_df = df[df.Class == 1]
 
 df_norm = df
-#df_norm['Time'] = StandardScaler().fit_transform(df_norm['Time'].values.reshape(-1, 1))
-#df_norm['Amount'] = StandardScaler().fit_transform(df_norm['Amount'].values.reshape(-1, 1))
+df_norm['Time'] = StandardScaler().fit_transform(df_norm['Time'].values.reshape(-1, 1))
+df_norm['Amount'] = StandardScaler().fit_transform(df_norm['Amount'].values.reshape(-1, 1))
 
 train_x, test_x = train_test_split(df_norm, test_size=TEST_PCT, random_state=RANDOM_SEED)
 train_x = train_x[train_x.Class == 0]

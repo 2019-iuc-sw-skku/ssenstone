@@ -2,6 +2,7 @@ import sys
 import server
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
+from model_names import ModelNames
 
 HOST = 'localhost'
 PORT = 1234
@@ -191,36 +192,32 @@ class ServerGUI(QWidget):
         if self.button.text() == 'Start':
             try:
                 pathlist = []
+                modelnamelist = []
+
                 if self.le1.text() == '':
                     raise ModelNumberError()
 
                 pathlist.append(self.le1.text())
-
-                modelnamelist = []
-                modelnamelist.append(self.cb1.currentText())
-
-                if self.cb.currentText() == '3':
-                    if self.le2.text() == '' or self.le3.text() == '':
+                modelnamelist.append(self.cb1.currentIndex())
+                
+                if int(self.cb.currentText()) >= 2:
+                    if self.le2.text() == '':
                         raise ModelNumberError()
                     pathlist.append(self.le2.text())
+                    modelnamelist.append(self.cb2.currentIndex())
+                    
+                if int(self.cb.currentText()) >= 3:
+                    if self.le3.text() == '':
+                        raise ModelNumberError()
                     pathlist.append(self.le3.text())
+                    modelnamelist.append(self.cb3.currentIndex())
 
-                    modelnamelist.append(self.cb2.currentText())
-                    modelnamelist.append(self.cb3.currentText())
+                self.button.setText('Stop')
 
-                    self.button.setText('Stop')
+                self.logtext.clear()
+                self._stdout.start()
 
-                    self.logtext.clear()
-                    self._stdout.start()
-
-                    self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, 2)
-                else:
-                    self.button.setText('Stop')
-
-                    self.logtext.clear()
-                    self._stdout.start()
-
-                    self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, 1)
+                self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, 1)
             except ModelNumberError:
                 msgbox = QMessageBox()
                 msgbox.setText('Please select models correctly')
