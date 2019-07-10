@@ -39,7 +39,7 @@ class CCFDT:
 
         print('NB Train Start..')
         
-        nb=naive_bayes.GaussianNB()
+        nb=naive_bayes.BernoulliNB()
         nb.fit(train_x,train_y)
 
         pickle.dump(nb, open("./model_nb" + str(self.model_set) + ".sav", "wb"))
