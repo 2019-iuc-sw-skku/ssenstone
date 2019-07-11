@@ -53,6 +53,7 @@ class MyTcpHandler(socketserver.StreamRequestHandler):
                 self.request.send(bytes(str('0,%d' % score), 'utf8'))
             else:
                 self.request.send(bytes(str('1,%d' % score), 'utf8'))
+            print("[%d]\n" % score)
 
 
 class ThreadedServer(socketserver.ThreadingTCPServer):
