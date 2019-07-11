@@ -21,7 +21,6 @@ warnings.filterwarnings("ignore")
 HOST = 'localhost'
 PORT = 1234
 
-DEFAULT_GRAPH = tf.get_default_graph()
 
 class MyTcpHandler(socketserver.StreamRequestHandler):
     '''
@@ -35,7 +34,7 @@ class MyTcpHandler(socketserver.StreamRequestHandler):
         data = self.request.recv(1024)
         nparr = pd.read_json(data.decode()).as_matrix()
         score = 0
-        with DEFAULT_GRAPH.as_default():
+        with self.server.graph.as_default():
             for model, name in zip(self.server.model, self.server.model_names):
                 answer = model.predict(nparr)
                 if name == ModelNames.AUTOENCODED_DEEP_LEARNING:                        #keras deep learning
@@ -61,6 +60,7 @@ class ThreadedServer(socketserver.ThreadingTCPServer):
     '''
     def __init__(self, listen_addr):
         socketserver.ThreadingTCPServer.__init__(self, listen_addr, MyTcpHandler)
+        self.graph = tf.get_default_graph()
         self.model = []
         self.model_names = []
         self.pass_score = 0
