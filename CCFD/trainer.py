@@ -84,6 +84,7 @@ class Trainer:
                 example:
                     {'epochs': 100, 'loss': keras.loss.mean_squared_error, 'optimizer': keras.optimizers.Adam()}
 
+                For an example, you can see CCFD_(algorithm).py file
         '''
         self.model_name = model_name
         df = pd.read_csv(self.fname)
@@ -132,13 +133,13 @@ class Trainer:
             self.model = nb
 
         elif model_name == ModelNames.SVM:
-            clf = svm.SVC(kernel='linear', random_state=self.RSEED)
+            clf = svm.SVC(kernel='linear', random_state=self.RSEED, **properties)
             clf.fit(train_x, train_y)
             pickle.dump(clf, open(output_path, "wb"))
             self.model = clf
 
         elif model_name == ModelNames.SVM_RBF_KERNEL:
-            clf = svm.SVC(kernel='rbf', random_state=self.RSEED)
+            clf = svm.SVC(random_state=self.RSEED, **properties)
             clf.fit(train_x, train_y)
             pickle.dump(clf, open(output_path, "wb"))
             self.model = clf

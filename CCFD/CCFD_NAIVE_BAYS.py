@@ -1,9 +1,7 @@
 import pickle
-import tensorflow
-from sklearn import metrics, model_selection,preprocessing, naive_bayes
+from sklearn import metrics, model_selection, preprocessing, naive_bayes
 import pandas as pd
 from matplotlib import pyplot as plt
-import matplotlib
 import seaborn as sns
 
 class CCFDT:
@@ -42,7 +40,8 @@ class CCFDT:
         nb=naive_bayes.BernoulliNB()
         nb.fit(train_x,train_y)
 
-        pickle.dump(nb, open("./model_nb" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(nb, open("./CCFD/models/model_nb" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(sc, open("./CCFD/scalers/scaler_nb" + str(self.model_set) + ".sav", "wb"))
 
         pre=nb.predict(test_x)
         score=metrics.accuracy_score(test_y,pre)

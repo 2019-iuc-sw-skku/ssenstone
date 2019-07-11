@@ -1,9 +1,7 @@
 import pickle
-import tensorflow
-from sklearn import metrics, model_selection,preprocessing, ensemble
+from sklearn import metrics, model_selection, preprocessing, ensemble
 import pandas as pd
 from matplotlib import pyplot as plt
-import matplotlib
 import seaborn as sns
 
 class CCFDT:
@@ -42,7 +40,8 @@ class CCFDT:
         ada=ensemble.AdaBoostClassifier(n_estimators=200, random_state=0)
         ada.fit(train_x,train_y)
 
-        pickle.dump(ada, open("./model_ada" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(ada, open("./CCFD/models/model_ada" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(sc, open("./CCFD/scalers/scaler_ada" + str(self.model_set) + ".sav", "wb"))
 
         pre=ada.predict(test_x)
         score=metrics.accuracy_score(test_y,pre)
