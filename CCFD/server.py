@@ -98,8 +98,9 @@ class StoppableThread(threading.Thread):
 
     def stop(self):
         self._stop_event.set()
-        self.server.shutdown()
-        self.server.server_close()
+        if hasattr(self, 'server'):
+            self.server.shutdown()
+            self.server.server_close()
         K.clear_session()
 
     def stopped(self):
