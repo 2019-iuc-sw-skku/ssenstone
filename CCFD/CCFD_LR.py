@@ -45,7 +45,7 @@ class CCFDT:
         
         pre=lr.predict(test_x)
 
-        pickle.dump(lr, open("./model_Lr" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(lr, open("./CCFD/model_Lr" + str(self.model_set) + ".sav", "wb"))
 
         accuracy = accuracy_score(test_y, pre)
         report=classification_report(test_y, pre)
@@ -64,7 +64,7 @@ class CCFDT:
 
     def show_pickle(self):
         data_list = []
-        with open("./model_Lr" + str(self.model_set) + ".sav",'rb') as FL:
+        with open("./CCFD/model_Lr" + str(self.model_set) + ".sav",'rb') as FL:
             data=[]
             while(True):
                 try: 
