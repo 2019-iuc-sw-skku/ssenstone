@@ -39,10 +39,10 @@ class CCFDT:
 
         print('SVM_RBF Train Start..')
         
-        clf=svm.SVC(kernel='rbf', random_state=0, gamma='scale', C=100)
+        clf=svm.SVC(random_state=0, gamma=0.0001, cache_size=300, C=100)
         clf.fit(train_x,train_y)
 
-        pickle.dump(clf, open("./model_svm_rbf" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(clf, open("./CCFD/model_svm_rbf" + str(self.model_set) + ".sav", "wb"))
 
         pre=clf.predict(test_x)
         score=metrics.accuracy_score(test_y,pre)
@@ -62,7 +62,7 @@ class CCFDT:
 
     def show_pickle(self):
         data_list = []
-        with open("./model_svm_rbf" + str(self.model_set) + ".sav",'rb') as FL:
+        with open("./CCFD/model_svm_rbf" + str(self.model_set) + ".sav",'rb') as FL:
             data=[]
             while(True):
                 try: 
