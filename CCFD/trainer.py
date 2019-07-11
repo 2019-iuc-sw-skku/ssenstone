@@ -36,11 +36,12 @@ class Trainer:
         self.fname = filepath
         self.model = None
 
-    def training(self, train_pct, output_path, model_name, properties):
+    def training(self, train_pct, output_path, output_scaler_path, model_name, properties):
         '''
         parameters:
             train_pct(float) : fraction of train data per overall data.
             output_path(str) : path to output model file.
+            output_scaler_path(str): path to output scaler file.
             model_name(int)  : enumerated model name.
                                see model_names.py
             properties(dict) : dictionary of properties. depends on model_name.
@@ -91,8 +92,8 @@ class Trainer:
         df = df.sample(frac=1)
 
         df_norm = df
-        df_norm['Time'] = StandardScaler().fit_transform(df_norm['Time'].values.reshape(-1, 1))
-        df_norm['Amount'] = StandardScaler().fit_transform(df_norm['Amount'].values.reshape(-1, 1))
+#        df_norm['Time'] = StandardScaler().fit_transform(df_norm['Time'].values.reshape(-1, 1))
+#        df_norm['Amount'] = StandardScaler().fit_transform(df_norm['Amount'].values.reshape(-1, 1))
 
         
         new_df = df_norm.sample(frac=1, random_state=self.RSEED)
@@ -104,6 +105,9 @@ class Trainer:
         train_x = x.values
         train_y = y.values
 
+        sc = StandardScaler()
+        train_x = sc.fit_transform(train_x)
+        pickle.dump(sc, open(output_scaler_path, "wb"))
         print("Train start...")
         if model_name == ModelNames.RANDOM_FOREST:
             
