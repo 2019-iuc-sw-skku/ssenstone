@@ -255,15 +255,15 @@ class ServerGUI(QWidget):
         self.le3.setText(fname[0])
 
     def sbtn1Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/scaler", "sav(*.sav)")
+        fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/scalers", "sav(*.sav)")
         self.sle1.setText(fname[0])
 
     def sbtn2Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/scaler", "sav(*.sav)")
+        fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/scalers", "sav(*.sav)")
         self.sle2.setText(fname[0])
 
     def sbtn3Clicked(self):
-        fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/scaler", "sav(*.sav)")
+        fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/scalers", "sav(*.sav)")
         self.sle3.setText(fname[0])
 
     def log(self):
