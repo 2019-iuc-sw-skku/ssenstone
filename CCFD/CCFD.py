@@ -45,7 +45,8 @@ class CCFDT:
 
         print("Training score", training_score)
 
-        pickle.dump(rf, open("./CCFD/models/model" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(rf, open("./CCFD/models/model_rf" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(sc, open("./CCFD/scalers/scaler_rf" + str(self.model_set) + ".sav", "wb"))
 
         predicted = rf.predict(test_x)
         accuracy = accuracy_score(test_y, predicted)
