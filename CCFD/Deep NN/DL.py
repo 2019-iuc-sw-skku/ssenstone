@@ -1,3 +1,5 @@
+import pickle
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -14,13 +16,14 @@ LABELS = ["Normal","Fraud"]
 RANDOM_SEED = 1398
 TEST_PCT = 0.2
 
-df = pd.read_csv("./CCFD/creditcard.csv")
+df = pd.read_csv("./creditcard.csv")
 normal_df = df[df.Class == 0]
 fraud_df = df[df.Class == 1]
 
 df_norm = df
-df_norm['Time'] = StandardScaler().fit_transform(df_norm['Time'].values.reshape(-1, 1))
-df_norm['Amount'] = StandardScaler().fit_transform(df_norm['Amount'].values.reshape(-1, 1))
+sc = StandardScaler()
+#df_norm['Time'] = sc.fit_transform(df_norm['Time'].values.reshape(-1, 1))
+#df_norm['Amount'] = sc.fit_transform(df_norm['Amount'].values.reshape(-1, 1))
 
 train_x, test_x = train_test_split(df_norm, test_size=TEST_PCT, random_state=RANDOM_SEED)
 train_x = train_x[train_x.Class == 0]
@@ -31,6 +34,9 @@ test_x = test_x.drop(['Class'], axis=1)
 
 train_x = train_x.values
 test_x = test_x.values
+
+train_x = sc.fit_transform(train_x)
+test_x = sc.transform(test_x)
 
 input_dimension = train_x.shape[1]
 nb_epoch = 10
@@ -52,6 +58,7 @@ AutoEncoderModel = Model(inputs=input_layer, outputs=Decoder3)
 AutoEncoderModel.compile(metrics=['accuracy'], loss='mean_squared_error', optimizer='adam')
 
 cp = ModelCheckpoint(filepath="./CCFD/models/fraud_dl.h5", save_best_only=True)
+pickle.dump(sc, open("./CCFD/scalers/scaler_dl.sav", "wb"))
 
 tb = TensorBoard(log_dir='./dllogs', write_graph=True, write_images=True)
 
