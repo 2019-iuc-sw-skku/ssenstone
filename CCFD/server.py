@@ -147,5 +147,5 @@ def run_server(listen_addr, model_paths, scaler_paths, model_names, pass_score=1
 if __name__ == '__main__':
     run_server((HOST, PORT),
                ['./CCFD/models/model_rf1.sav', './CCFD/models/model_svm_rbf1.sav', './CCFD/models/fraud_dl.h5'],
-               ['./CCFD/scalers/scaler_rf1.sav', './CCFD/scalers/scaler_rbf1.sav', './CCFD/scalers/scaler_dl.sav'],
+               ['./CCFD/scalers/scaler_rf1.sav', './CCFD/scalers/scaler_svm_rbf1.sav', './CCFD/scalers/scaler_dl.sav'],
                [ModelNames.RANDOM_FOREST, ModelNames.SVM, ModelNames.AUTOENCODED_DEEP_LEARNING], 3)
