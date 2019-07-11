@@ -113,8 +113,16 @@ class ServerGUI(QWidget):
         self.btn2.setDisabled(True)
         self.btn3.setDisabled(True)
 
-        for i in [0, 1, 2]:
-            grid.addWidget(QLabel('Model ' + str(i + 1), self), i + 2, 0)
+        self.sbtn1 = QPushButton("Browse..", self)
+        self.sbtn2 = QPushButton("Browse..", self)
+        self.sbtn3 = QPushButton("Browse..", self)
+
+        self.sbtn2.setDisabled(True)
+        self.sbtn3.setDisabled(True)
+
+        for i in [1, 2, 3]:
+            grid.addWidget(QLabel('Model ' + str(i), self), 2 * i, 0)
+            grid.addWidget(QLabel('Scaler ' + str(i), self), 2 * i + 1, 0)
 
         self.cb1 = QComboBox(self)
         self.cb1.addItems(['Random forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Logistic Regression'])
@@ -130,21 +138,40 @@ class ServerGUI(QWidget):
         self.cb3.currentIndexChanged.connect(self.cb3Changed)
         self.cb3.setDisabled(True)
 
+        self.sle1 = QLineEdit("", self)
+        self.sle1.setReadOnly(True)
+        self.sle2 = QLineEdit("", self)
+        self.sle2.setReadOnly(True)
+        self.sle3 = QLineEdit("", self)
+        self.sle3.setReadOnly(True)
+
         grid.addWidget(self.cb1, 2, 1)
-        grid.addWidget(self.cb2, 3, 1)
-        grid.addWidget(self.cb3, 4, 1)
+        grid.addWidget(self.cb2, 4, 1)
+        grid.addWidget(self.cb3, 6, 1)
 
         grid.addWidget(self.le1, 2, 2)
-        grid.addWidget(self.le2, 3, 2)
-        grid.addWidget(self.le3, 4, 2)
+        grid.addWidget(self.le2, 4, 2)
+        grid.addWidget(self.le3, 6, 2)
+
+        grid.addWidget(self.sle1, 3, 2)
+        grid.addWidget(self.sle2, 5, 2)
+        grid.addWidget(self.sle3, 7, 2)
 
         grid.addWidget(self.btn1, 2, 3)
-        grid.addWidget(self.btn2, 3, 3)
-        grid.addWidget(self.btn3, 4, 3)
+        grid.addWidget(self.btn2, 4, 3)
+        grid.addWidget(self.btn3, 6, 3)
+
+        grid.addWidget(self.sbtn1, 3, 3)
+        grid.addWidget(self.sbtn2, 5, 3)
+        grid.addWidget(self.sbtn3, 7, 3)
 
         self.btn1.clicked.connect(self.btn1Clicked)
         self.btn2.clicked.connect(self.btn2Clicked)
         self.btn3.clicked.connect(self.btn3Clicked)
+
+        self.sbtn1.clicked.connect(self.sbtn1Clicked)
+        self.sbtn2.clicked.connect(self.sbtn2Clicked)
+        self.sbtn3.clicked.connect(self.sbtn3Clicked)
 
         groupbox.setLayout(grid)
 
@@ -158,6 +185,10 @@ class ServerGUI(QWidget):
             self.btn2.setDisabled(True)
             self.btn3.setDisabled(True)
 
+            self.sbtn2.setDisabled(True)
+            self.sbtn3.setDisabled(True)
+
+
             self.rbtn1.setChecked(True)
             self.rbtn2.setDisabled(True)
             self.rbtn3.setDisabled(True)
@@ -168,6 +199,9 @@ class ServerGUI(QWidget):
 
             self.btn2.setDisabled(False)
             self.btn3.setDisabled(True)
+
+            self.sbtn2.setDisabled(False)
+            self.sbtn3.setDisabled(True)
 
             self.rbtn2.setChecked(True)
             self.rbtn2.setDisabled(False)
@@ -180,18 +214,24 @@ class ServerGUI(QWidget):
             self.btn2.setDisabled(False)
             self.btn3.setDisabled(False)
 
+            self.sbtn2.setDisabled(False)
+            self.sbtn3.setDisabled(False)
+
             self.rbtn2.setChecked(True)
             self.rbtn2.setDisabled(False)
             self.rbtn3.setDisabled(False)
 
     def cb1Changed(self):
         self.le1.clear()
+        self.sle1.clear()
 
     def cb2Changed(self):
         self.le2.clear()
+        self.sle2.clear()
 
     def cb3Changed(self):
         self.le3.clear()
+        self.sle3.clear()
 
     def btn1Clicked(self):
         if self.cb1.currentText() == 'Autoencoded Deep Learning':
@@ -214,6 +254,17 @@ class ServerGUI(QWidget):
             fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/models", "sav(*.sav)")
         self.le3.setText(fname[0])
 
+    def sbtn1Clicked(self):
+        fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/scaler", "sav(*.sav)")
+        self.sle1.setText(fname[0])
+
+    def sbtn2Clicked(self):
+        fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/scaler", "sav(*.sav)")
+        self.sle2.setText(fname[0])
+
+    def sbtn3Clicked(self):
+        fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/scaler", "sav(*.sav)")
+        self.sle3.setText(fname[0])
 
     def log(self):
         '''
@@ -246,24 +297,28 @@ class ServerGUI(QWidget):
         if self.button.text() == 'Start':
             try:
                 pathlist = []
+                scalerlist = []
                 modelnamelist = []
 
-                if self.le1.text() == '':
+                if self.le1.text() == '' or self.sle1.text() == '':
                     raise ModelNumberError()
 
                 pathlist.append(self.le1.text())
+                scalerlist.append(self.sle1.text())
                 modelnamelist.append(ModelNames(self.cb1.currentIndex()))
 
                 if int(self.cb.currentText()) >= 2:
-                    if self.le2.text() == '':
+                    if self.le2.text() == '' or self.sle2.text() == '':
                         raise ModelNumberError()
                     pathlist.append(self.le2.text())
+                    scalerlist.append(self.sle2.text())
                     modelnamelist.append(ModelNames(self.cb2.currentIndex()))
                     
                 if int(self.cb.currentText()) >= 3:
-                    if self.le3.text() == '':
+                    if self.le3.text() == '' or self.sle3.text() == '':
                         raise ModelNumberError()
                     pathlist.append(self.le3.text())
+                    scalerlist.append(self.sle3.text())
                     modelnamelist.append(ModelNames(self.cb3.currentIndex()))
 
                 score = self.getThresholdScore()
@@ -273,7 +328,7 @@ class ServerGUI(QWidget):
                 self.logtext.clear()
                 self._stdout.start()
 
-                self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, score)
+                self.serverthread = server.run_server((HOST, PORT), pathlist, scalerlist, modelnamelist, score)
 
             except ModelNumberError:
                 msgbox = QMessageBox()
