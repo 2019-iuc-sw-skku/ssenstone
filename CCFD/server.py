@@ -6,12 +6,13 @@ Receive data and recognize it using models
 import pickle
 import socketserver
 import threading
-import warnings
 import time
+import warnings
 
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from keras import backend as K
 from keras.models import load_model
 
 from model_names import ModelNames
@@ -98,6 +99,8 @@ class StoppableThread(threading.Thread):
     def stop(self):
         self._stop_event.set()
         self.server.shutdown()
+        self.server.server_close()
+        K.clear_session()
 
     def stopped(self):
         return self._stop_event.is_set()
@@ -117,12 +120,12 @@ def __set_server(listen_addr, model_paths, model_names, pass_score):
     for path, model_name in zip(model_paths, model_names):
         if model_name == ModelNames.AUTOENCODED_DEEP_LEARNING:    # if it's keras model, use keras-load_model
             server.model.append(load_model(path))
+            server.model[-1]._make_predict_function()
         else:                     # else it's pickle dumped model.
             server.model.append(pickle.load(open(path, 'rb')))
 
     server.pass_score = pass_score
     server.model_names = model_names
-#    server.start()
     return server
 
 def run_server(listen_addr, model_paths, model_names, pass_score=1):

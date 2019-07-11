@@ -8,12 +8,16 @@ HOST = 'localhost'
 PORT = 1234
 
 class ModelNumberError(Exception):
+    '''
+    If the number of model is not matched,
+    this error occur.
+    '''
     pass
 
 class StdoutRedirect(QtCore.QObject):
     printOccur = QtCore.pyqtSignal(str, str, name="print")
 
-    def __init__(self, *param):
+    def __init__(self):
         QtCore.QObject.__init__(self, None)
         self.daemon = True
         self.sysstdout = sys.stdout.write
@@ -25,18 +29,18 @@ class StdoutRedirect(QtCore.QObject):
 
     def start(self):
         sys.stdout.write = self.write
-        sys.stderr.write = lambda msg : self.write(msg, color="red")
+        sys.stderr.write = lambda msg: self.write(msg, color="red")
 
     def write(self, s, color="black"):
         sys.stdout.flush()
         self.printOccur.emit(s, color)
 
 class ServerGUI(QWidget):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(ServerGUI, self).__init__(parent)
 
         self._stdout = StdoutRedirect()
-        self._stdout.printOccur.connect(lambda x : self._append_text(x))
+        self._stdout.printOccur.connect(lambda x: self._append_text(x))
 
         self.initUI()
 
@@ -149,23 +153,23 @@ class ServerGUI(QWidget):
 
     def btn1Clicked(self):
         if self.cb1.currentText() == 'Autoencoded Deep Learning':
-            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "h5(*.h5)")
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/models", "h5(*.h5)")
         else:
-            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/models", "sav(*.sav)")
         self.le1.setText(fname[0])
 
     def btn2Clicked(self):
         if self.cb2.currentText() == 'Autoencoded Deep Learning':
-            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "h5(*.h5)")
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/models", "h5(*.h5)")
         else:
-            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/models", "sav(*.sav)")
         self.le2.setText(fname[0])
 
     def btn3Clicked(self):
         if self.cb3.currentText() == 'Autoencoded Deep Learning':
-            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "h5(*.h5)")
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/models", "h5(*.h5)")
         else:
-            fname = QFileDialog.getOpenFileName(self, "Load File", "./models", "sav(*.sav)")
+            fname = QFileDialog.getOpenFileName(self, "Load File", "./CCFD/models", "sav(*.sav)")
         self.le3.setText(fname[0])
 
 
@@ -217,7 +221,10 @@ class ServerGUI(QWidget):
                 self.logtext.clear()
                 self._stdout.start()
 
-                self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, 1)
+                if self.cb.currentText() == '1':
+                    self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, 1)
+                elif self.cb.currentText() == '3':
+                    self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, 2)
             except ModelNumberError:
                 msgbox = QMessageBox()
                 msgbox.setText('Please select models correctly')
