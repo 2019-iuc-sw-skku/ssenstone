@@ -1,12 +1,11 @@
 import pickle
 import matplotlib.pyplot as plt
-import mglearn
 import pandas as pd
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.model_selection import train_test_split
 
 class CCFDT:
     def __init__(self, RSEED, TESTP, fname ):
@@ -45,7 +44,8 @@ class CCFDT:
         
         pre=lr.predict(test_x)
 
-        pickle.dump(lr, open("./CCFD/model_Lr" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(lr, open("./CCFD/models/model_Lr" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(sc, open("./CCFD/scalers/scaler_Lr" + str(self.model_set) + ".sav", "wb"))
 
         accuracy = accuracy_score(test_y, pre)
         report=classification_report(test_y, pre)
