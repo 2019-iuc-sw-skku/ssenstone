@@ -35,21 +35,27 @@ class MyTcpHandler(socketserver.StreamRequestHandler):
         data = self.request.recv(1024)
         nparr = pd.read_json(data.decode()).as_matrix()
         score = 0
+        flag = []
         with self.server.graph.as_default():
             for model, scaler, name in zip(self.server.model, self.server.scaler, self.server.model_names):
                 scaled_arr = scaler.transform(nparr)
                 answer = model.predict(scaled_arr)
                 if name == ModelNames.AUTOENCODED_DEEP_LEARNING:                        #keras deep learning
                     mse = np.mean(np.power(scaled_arr - answer, 2))
-                    if mse > 5:
+                    if mse < 5:
+                        flag.append(0)
                         score = score + 1
-
+                    else:
+                        flag.append(1)
                 else:
                     if answer[0] == 0:
+                        flag.append(0)
                         score = score + 1
-
+                    else:
+                        flag.append(1)
                 if score >= self.server.pass_score:
                     break
+            print(flag)
             if score >= self.server.pass_score:
                 self.request.send(bytes(str('0,%d' % score), 'utf8'))
             else:
@@ -140,6 +146,6 @@ def run_server(listen_addr, model_paths, scaler_paths, model_names, pass_score=1
 
 if __name__ == '__main__':
     run_server((HOST, PORT),
-               ['./CCFD/models/model1.sav', './CCFD/models/fraud_dl.h5'],
-               ['./CCFD/scalers/scaler_rbf1.sav', './CCFD/scalers/scaler_dl.sav'],
-               [ModelNames.RANDOM_FOREST, ModelNames.AUTOENCODED_DEEP_LEARNING], 2)
+               ['./CCFD/models/model_rf1.sav', './CCFD/models/model_svm_rbf1.sav', './CCFD/models/fraud_dl.h5'],
+               ['./CCFD/scalers/scaler_rf1.sav', './CCFD/scalers/scaler_rbf1.sav', './CCFD/scalers/scaler_dl.sav'],
+               [ModelNames.RANDOM_FOREST, ModelNames.SVM, ModelNames.AUTOENCODED_DEEP_LEARNING], 3)
