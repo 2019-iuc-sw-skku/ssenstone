@@ -41,7 +41,7 @@ class CCFDT:
         clf.fit(train_x,train_y)
 
         pickle.dump(clf, open("./CCFD/models/model_svm_rbf" + str(self.model_set) + ".sav", "wb"))
-        pickle.dump(sc, open("./CCFD/scalers/scaler_rbf" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(sc, open("./CCFD/scalers/scaler_svm_rbf" + str(self.model_set) + ".sav", "wb"))
 
         pre=clf.predict(test_x)
         score=metrics.accuracy_score(test_y,pre)
