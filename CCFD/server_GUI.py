@@ -70,12 +70,34 @@ class ServerGUI(QWidget):
         grid = QGridLayout()
 
         self.cb = QComboBox(self)
-        self.cb.addItems(['1', '3'])
+        self.cb.addItems(['1', '2', '3'])
 
         self.cb.currentIndexChanged.connect(self.numChanged)
 
         grid.addWidget(QLabel("Number of model", self), 0, 0)
         grid.addWidget(self.cb, 1, 0)
+
+        thresholdlabel = QLabel("Threshold Score", self)
+        thresholdlabel.setAlignment(QtCore.Qt.AlignCenter)
+        grid.addWidget(thresholdlabel, 0, 1)
+        radiobuttongroup = QGroupBox()
+        radiobuttongrid = QGridLayout()
+        
+        self.rbtn1 = QRadioButton('1', self)
+        self.rbtn2 = QRadioButton('2', self)
+        self.rbtn3 = QRadioButton('3', self)
+
+        self.rbtn1.setChecked(True)
+        self.rbtn2.setDisabled(True)
+        self.rbtn3.setDisabled(True)
+
+        radiobuttongrid.addWidget(self.rbtn1, 0, 0)
+        radiobuttongrid.addWidget(self.rbtn2, 0, 1)
+        radiobuttongrid.addWidget(self.rbtn3, 0, 2)
+
+        radiobuttongroup.setLayout(radiobuttongrid)
+
+        grid.addWidget(radiobuttongroup, 1, 1)
 
         self.le1 = QLineEdit("", self)
         self.le1.setReadOnly(True)
@@ -135,12 +157,32 @@ class ServerGUI(QWidget):
 
             self.btn2.setDisabled(True)
             self.btn3.setDisabled(True)
+
+            self.rbtn1.setChecked(True)
+            self.rbtn2.setDisabled(True)
+            self.rbtn3.setDisabled(True)
+
+        elif self.cb.currentText() == '2':
+            self.cb2.setDisabled(False)
+            self.cb3.setDisabled(True)
+
+            self.btn2.setDisabled(False)
+            self.btn3.setDisabled(True)
+
+            self.rbtn2.setChecked(True)
+            self.rbtn2.setDisabled(False)
+            self.rbtn3.setDisabled(True)
+
         elif self.cb.currentText() == '3':
             self.cb2.setDisabled(False)
             self.cb3.setDisabled(False)
 
             self.btn2.setDisabled(False)
             self.btn3.setDisabled(False)
+
+            self.rbtn2.setChecked(True)
+            self.rbtn2.setDisabled(False)
+            self.rbtn3.setDisabled(False)
 
     def cb1Changed(self):
         self.le1.clear()
@@ -192,6 +234,14 @@ class ServerGUI(QWidget):
         groupbox.setLayout(grid)
         return groupbox
 
+    def getThresholdScore(self):
+        if self.rbtn1.isChecked():
+            return 1
+        elif self.rbtn2.isChecked():
+            return 2
+        elif self.rbtn3.isChecked():
+            return 3
+
     def server_handle(self):
         if self.button.text() == 'Start':
             try:
@@ -216,15 +266,15 @@ class ServerGUI(QWidget):
                     pathlist.append(self.le3.text())
                     modelnamelist.append(ModelNames(self.cb3.currentIndex()))
 
+                score = self.getThresholdScore()
+
                 self.button.setText('Stop')
 
                 self.logtext.clear()
                 self._stdout.start()
 
-                if self.cb.currentText() == '1':
-                    self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, 1)
-                elif self.cb.currentText() == '3':
-                    self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, 2)
+                self.serverthread = server.run_server((HOST, PORT), pathlist, modelnamelist, score)
+
             except ModelNumberError:
                 msgbox = QMessageBox()
                 msgbox.setText('Please select models correctly')
