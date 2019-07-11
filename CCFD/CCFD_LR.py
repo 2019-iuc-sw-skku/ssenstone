@@ -40,7 +40,7 @@ class CCFDT:
         test_x=sc.transform(test_x)
         
         print("LR Train start...")
-        lr=LogisticRegression()
+        lr=LogisticRegression(solver='newton-cg', C=0.1, max_iter=300, multi_class='multinomial')
         lr.fit(train_x, train_y)
         
         pre=lr.predict(test_x)
