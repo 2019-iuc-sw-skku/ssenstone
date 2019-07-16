@@ -1,8 +1,5 @@
 '''
 분류기 프로그램.
-현재 지원되는 모델
-    Random Forest
-    Autoencoder Deep Learning (Keras)
 '''
 
 import pickle
@@ -241,7 +238,7 @@ if __name__ == '__main__':
     FD = Trainer('./CCFD/creditcard.csv')
 #    FD.training(train_pct=0.2, output_path="./model.sav",
 #                model_name=ModelNames.RANDOM_FOREST, properties={'n_estimators':100})
-    FD.training(train_pct=0.2, output_path="./model_dl.sav",
+    FD.training(train_pct=0.2, output_path="./model_dl.sav", output_scaler_path="./scaler_dl.sav",
                 model_name=ModelNames.AUTOENCODED_DEEP_LEARNING,
                 properties={'epochs': 100, 'loss': keras.losses.mean_squared_error, 'optimizer': keras.optimizers.Adam()})
     FD.predict_current_model()
