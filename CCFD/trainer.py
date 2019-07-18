@@ -5,10 +5,13 @@
 import pickle
 
 import keras
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
+from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import threading
 from keras import regularizers
 from keras.callbacks import ModelCheckpoint
 from keras.layers import Dense, Input
@@ -22,20 +25,14 @@ from sklearn.linear_model import LogisticRegression
 from model_names import ModelNames
 
 
-class Trainer:
-    def __init__(self, filepath, random_state=None):
+class Trainer(threading.Thread):
+    def __init__(self, filepath, train_pct, output_path, output_scaler_path, model_name, properties, random_state=None):
         '''
         parameters:
             filepath(str): path to csv dataset file
             random_state: random seed
-        '''
-        self.RSEED = random_state
-        self.fname = filepath
-        self.model = None
 
-    def training(self, train_pct, output_path, output_scaler_path, model_name, properties):
-        '''
-        parameters:
+        training parameters:
             train_pct(float) : fraction of train data per overall data.
             output_path(str) : path to output model file.
             output_scaler_path(str): path to output scaler file.
@@ -84,6 +81,22 @@ class Trainer:
 
                 For an example, you can see CCFD_(algorithm).py file
         '''
+        threading.Thread.__init__(self)
+
+        self.RSEED = random_state
+        self.fname = filepath
+        self.model = None
+
+        self.train_pct = train_pct
+        self.output_path = output_path
+        self.output_scaler_path = output_scaler_path
+        self.model_name = model_name
+        self.properties = properties
+
+    def run(self):
+        self.training(self.train_pct, self.output_path, self.output_scaler_path, self.model_name, self.properties)
+
+    def training(self, train_pct, output_path, output_scaler_path, model_name, properties):
         self.model_name = model_name
         df = pd.read_csv(self.fname)
         df = df.sample(frac=1)
@@ -105,7 +118,7 @@ class Trainer:
         sc = StandardScaler()
         train_x = sc.fit_transform(train_x)
         pickle.dump(sc, open(output_scaler_path, "wb"))
-        print("Train start...")
+        
         if model_name == ModelNames.RANDOM_FOREST:
             
             rf = RandomForestClassifier(**properties, random_state=self.RSEED)
@@ -195,7 +208,7 @@ class Trainer:
         if self.model is None:
             print('Selected model not available')
         
-        LABELS = ["Normal","Fraud"]
+        LABELS = ["Normal", "Fraud"]
         
         df = pd.read_csv(self.fname)
         df = df.sample(frac=1)
@@ -225,7 +238,7 @@ class Trainer:
 
         conf_matrix = confusion_matrix(test_y, predicted)
 
-        plt.figure(figsize=(12, 12))
+        fig = plt.figure(figsize=(12, 12))
         sns.heatmap(conf_matrix, xticklabels=LABELS, yticklabels=LABELS, annot=True, fmt="d")
         plt.title("Confusion matrix")
         plt.ylabel('True class')
@@ -233,7 +246,7 @@ class Trainer:
         plt.show()
 
 
-
+"""
 if __name__ == '__main__':
     FD = Trainer('./CCFD/creditcard.csv')
 #    FD.training(train_pct=0.2, output_path="./model.sav",
@@ -242,3 +255,4 @@ if __name__ == '__main__':
                 model_name=ModelNames.AUTOENCODED_DEEP_LEARNING,
                 properties={'epochs': 100, 'loss': keras.losses.mean_squared_error, 'optimizer': keras.optimizers.Adam()})
     FD.predict_current_model()
+"""
