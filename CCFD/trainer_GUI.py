@@ -18,7 +18,7 @@ class FilePathError(Exception):
 class TrainerGUI(QWidget):
     def __init__(self):
         super().__init__()
-
+        self.pathlist = []
         self.setupUI()
 
     def setupUI(self):
@@ -61,6 +61,7 @@ class TrainerGUI(QWidget):
         groupbox = QGroupBox('Browse New Data Sets')
 
         grid = QGridLayout()
+        buttongrid = QGridLayout()
 
         self.te = QTextEdit()
         self.te.setAcceptRichText(False)
@@ -69,8 +70,14 @@ class TrainerGUI(QWidget):
         btn = QPushButton("Browse..", self)
         btn.clicked.connect(self.buttonClicked)
 
+        btn2 = QPushButton("Clear", self)
+        btn2.clicked.connect(self.clearButton)
+
+        buttongrid.addWidget(btn, 0, 0)
+        buttongrid.addWidget(btn2, 1, 0)
+
         grid.addWidget(self.te, 0, 0)
-        grid.addWidget(btn, 0, 1)
+        grid.addLayout(buttongrid, 0, 1)
 
         groupbox.setLayout(grid)
 
@@ -78,8 +85,15 @@ class TrainerGUI(QWidget):
 
     def buttonClicked(self):
         fname = QFileDialog.getOpenFileNames(self, "Load Files", ".", "csv(*.csv)")
+
         for i in fname[0]:
-            self.te.append(i)
+            if i not in self.pathlist:
+                self.te.append(i)
+                self.pathlist.append(i)
+
+    def clearButton(self):
+        self.te.clear()
+        self.pathlist = []
 
     def modelSetting(self):
         groupbox = QGroupBox('Select Model')
@@ -297,11 +311,10 @@ class TrainerGUI(QWidget):
         self.startbtn.setDisabled(False)
 
     def combineData(self):
-        pathlist = self.te.toPlainText().split('\n')
         with open(self.le.text(), 'a', newline='') as original_data:
-            if pathlist != ['']:
+            if self.pathlist != ['']:
                 filewriter = csv.writer(original_data)
-                for path in pathlist:
+                for path in self.pathlist:
                     with open(path, 'r', newline='') as new_data:
                         filereader = csv.reader(new_data)
                         header = next(filereader)
