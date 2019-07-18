@@ -9,8 +9,26 @@ trainer에게 학습하는데 필요한 인자들과 같이 전달을 합니다.
 import sys
 import csv
 import trainer
+import threading
+import time
 from model_names import ModelNames
 from PyQt5.QtWidgets import *
+
+class ProgressThread(threading.Thread):
+    def __init__(self, text, fd, btn):
+        threading.Thread.__init__(self)
+        self.text = text
+        self.fd = fd
+        self.btn = btn
+
+    def run(self):
+        while self.fd.is_alive():
+            time.sleep(1)
+
+        self.text.setText('Done')
+        self.fd.predict_current_model()
+        self.btn.setDisabled(False)
+
 
 class FilePathError(Exception):
     pass
@@ -19,6 +37,7 @@ class TrainerGUI(QWidget):
     def __init__(self):
         super().__init__()
         self.pathlist = []
+
         self.setupUI()
 
     def setupUI(self):
@@ -247,6 +266,8 @@ class TrainerGUI(QWidget):
         btn2 = QPushButton("Browse..", self)
         btn2.clicked.connect(self.button2Clicked)
 
+        self.statelabel = QLabel('Wait...', self)
+
         grid.addWidget(QLabel('Save File Location'), 0, 0)
         grid.addWidget(self.te1, 0, 1)
         grid.addWidget(btn1, 0, 2)
@@ -254,6 +275,8 @@ class TrainerGUI(QWidget):
         grid.addWidget(self.te2, 1, 1)
         grid.addWidget(btn2, 1, 2)
         grid.addWidget(self.startbtn, 2, 2)
+        grid.addWidget(QLabel('State'), 2, 0)
+        grid.addWidget(self.statelabel, 2, 1)
 
         groupbox.setLayout(grid)
 
@@ -289,11 +312,17 @@ class TrainerGUI(QWidget):
             arguments = self.getProperties()
 
             self.combineData()
-            FD = trainer.Trainer(self.le.text())
-            FD.training(train_pct=pct, output_path=sav, output_scaler_path=scaler,
-                        model_name=ModelNames(self.cb.currentIndex()), properties=arguments)
 
-            FD.predict_current_model()
+            
+            self.statelabel.setText('Training...')
+
+            FD = trainer.Trainer(self.le.text(), train_pct=pct, output_path=sav, output_scaler_path=scaler,
+                                 model_name=ModelNames(self.cb.currentIndex()), properties=arguments)
+            
+            progress = ProgressThread(self.statelabel, FD, self.startbtn)
+
+            FD.start()
+            progress.start()
 
         except FileNotFoundError:
             msgbox = QMessageBox()
@@ -307,8 +336,6 @@ class TrainerGUI(QWidget):
             msgbox = QMessageBox()
             msgbox.setText('Please select output path correctly')
             msgbox.exec()
-
-        self.startbtn.setDisabled(False)
 
     def combineData(self):
         with open(self.le.text(), 'a', newline='') as original_data:
