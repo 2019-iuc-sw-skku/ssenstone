@@ -1,11 +1,23 @@
 import sys
 import server
+import threading
+import time
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
 from model_names import ModelNames
 
 HOST = 'localhost'
 PORT = 1234
+
+class ButtonThread(threading.Thread):
+    def __init__(self, btn):
+        threading.Thread.__init__(self)
+        self.btn = btn
+    
+    def run(self):
+        self.btn.setDisabled(True)
+        time.sleep(3)
+        self.btn.setDisabled(False)
 
 class ModelNumberError(Exception):
     '''
@@ -294,6 +306,8 @@ class ServerGUI(QWidget):
             return 3
 
     def server_handle(self):
+        btnthread = ButtonThread(self.button)
+
         if self.button.text() == 'Start':
             try:
                 pathlist = []
@@ -322,12 +336,12 @@ class ServerGUI(QWidget):
                     modelnamelist.append(ModelNames(self.cb3.currentIndex()))
 
                 score = self.getThresholdScore()
-
                 self.button.setText('Stop')
 
                 self.logtext.clear()
                 self._stdout.start()
 
+                btnthread.start()
                 self.serverthread = server.run_server((HOST, PORT), pathlist, scalerlist, modelnamelist, score)
 
             except ModelNumberError:
@@ -338,9 +352,26 @@ class ServerGUI(QWidget):
         elif self.button.text() == 'Stop':
 
             # 서버 중지작업
+            btnthread.start()
             self.serverthread.stop()
             self._stdout.stop()
             self.button.setText('Start')
+
+    def closeEvent(self, event):
+        if hasattr(self, 'serverthread') and self.serverthread.is_alive():
+            '''
+            reply = QMessageBox.question(self, 'Message',
+                                         "Server is still alive.\nAre you sure to quit?",
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                self.serverthread.stop()
+                self._stdout.stop()
+                event.accept()
+            else:
+                event.ignore()
+            '''
+            self.serverthread.stop()
+            self._stdout.stop()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
