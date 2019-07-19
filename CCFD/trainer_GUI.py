@@ -15,22 +15,28 @@ from model_names import ModelNames
 from PyQt5.QtWidgets import *
 
 class ProgressThread(threading.Thread):
-    def __init__(self, text, fd, btn):
+    def __init__(self, text, fd, btn, resbtn):
         threading.Thread.__init__(self)
+
         self.text = text
         self.fd = fd
         self.btn = btn
+        self.resbtn = resbtn
 
     def run(self):
         while self.fd.is_alive():
             time.sleep(1)
 
         self.text.setText('Done')
-        self.fd.predict_current_model()
         self.btn.setDisabled(False)
+        self.resbtn.setDisabled(False)
 
 
 class FilePathError(Exception):
+    '''
+    When save file path or scaler path is empty,
+    this error occurs.
+    '''
     pass
 
 class TrainerGUI(QWidget):
@@ -253,11 +259,17 @@ class TrainerGUI(QWidget):
         groupbox = QGroupBox('Training')
 
         grid = QGridLayout()
+        statelayout = QGridLayout()
 
         self.te1 = QLineEdit()
         self.te1.setReadOnly(True)
         self.te2 = QLineEdit()
         self.te2.setReadOnly(True)
+
+        self.resultbtn = QPushButton("Show Result", self)
+        self.resultbtn.clicked.connect(self.resultButton)
+        self.resultbtn.setDisabled(True)
+
         self.startbtn = QPushButton("start", self)
         self.startbtn.clicked.connect(self.startButton)
 
@@ -268,6 +280,9 @@ class TrainerGUI(QWidget):
 
         self.statelabel = QLabel('Wait...', self)
 
+        statelayout.addWidget(self.statelabel, 0, 0)
+        statelayout.addWidget(self.resultbtn, 0, 1)
+
         grid.addWidget(QLabel('Save File Location'), 0, 0)
         grid.addWidget(self.te1, 0, 1)
         grid.addWidget(btn1, 0, 2)
@@ -276,7 +291,7 @@ class TrainerGUI(QWidget):
         grid.addWidget(btn2, 1, 2)
         grid.addWidget(self.startbtn, 2, 2)
         grid.addWidget(QLabel('State'), 2, 0)
-        grid.addWidget(self.statelabel, 2, 1)
+        grid.addLayout(statelayout, 2, 1)
 
         groupbox.setLayout(grid)
 
@@ -293,8 +308,12 @@ class TrainerGUI(QWidget):
         fname = QFileDialog.getSaveFileName(self, "Save File", "./CCFD/scalers", "sav(*.sav)")
         self.te2.setText(fname[0])
 
+    def resultButton(self):
+        self.fd.predict_current_model()
+
     def startButton(self):
         self.startbtn.setDisabled(True)
+        self.resultbtn.setDisabled(True)
         try:
             pct = float(self.pcttext.text())
 
@@ -313,16 +332,15 @@ class TrainerGUI(QWidget):
 
             self.combineData()
 
-            
             self.statelabel.setText('Training...')
 
-            FD = trainer.Trainer(self.le.text(), train_pct=pct, output_path=sav, output_scaler_path=scaler,
-                                 model_name=ModelNames(self.cb.currentIndex()), properties=arguments)
-            
-            progress = ProgressThread(self.statelabel, FD, self.startbtn)
 
-            FD.start()
-            progress.start()
+            self.fd = trainer.Trainer(self.le.text(), train_pct=pct, output_path=sav, output_scaler_path=scaler,
+                                      model_name=ModelNames(self.cb.currentIndex()), properties=arguments)
+            self.progress = ProgressThread(self.statelabel, self.fd, self.startbtn, self.resultbtn)
+
+            self.fd.start()
+            self.progress.start()
 
         except FileNotFoundError:
             msgbox = QMessageBox()
@@ -367,6 +385,17 @@ class TrainerGUI(QWidget):
             properties[self.lroption2.text()] = self.lrcombo.currentText()
 
         return properties
+
+    def closeEvent(self, event):
+        if hasattr(self, 'fd') and self.fd.is_alive():
+            reply = QMessageBox.question(self, 'Message',
+                                         "Training is not finished yet.\nAre you sure to quit?",
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                # 학습 스레드 종료 추가해야함
+                event.accept()
+            else:
+                event.ignore()
 
 
 if __name__ == '__main__':
