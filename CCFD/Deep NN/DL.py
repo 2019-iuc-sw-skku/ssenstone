@@ -6,9 +6,11 @@ from keras import regularizers
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.layers import Dense, Input
 from keras.models import Model
-from sklearn.metrics import confusion_matrix
+from keras.optimizers import Adam
+from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+#from keras.backend import argmax
 
 LABELS = ["Normal","Fraud"]
 RANDOM_SEED = 1398
@@ -33,10 +35,10 @@ train_x = train_x.values
 test_x = test_x.values
 
 input_dimension = train_x.shape[1]
-nb_epoch = 10
+nb_epoch = 100
 batch_size = 128
 encoding_dimension = 32
-learning_rate = 0.0000001
+learning_rate = 1e-7
 
 input_layer = Input(shape=(input_dimension, ))
 
@@ -60,10 +62,32 @@ history = AutoEncoderModel.fit(train_x, train_x, epochs=nb_epoch, batch_size=bat
 threshold_fixed = 5
 
 test_x_predictions = AutoEncoderModel.predict(test_x)
-mse = np.mean(np.power(test_x - test_x_predictions, 2), axis=1)
+
+mse = np.mean(np.power(test_x - test_x_predictions, 2), axis=-1)
 error_df = pd.DataFrame({'Reconstruction_error': mse, 'True_class': test_y})
 
 pred_y = [1 if e > threshold_fixed else 0 for e in error_df.Reconstruction_error.values]
+
+'''
+#presicion, recall, f1-score 계산
+precision = precision_score(error_df.True_class, pred_y)
+print('Precision: %f' % precision)
+
+recall = recall_score(error_df.True_class, pred_y)
+print('Recall: %f' % recall)
+
+f1 = f1_score(error_df.True_class, pred_y)
+print('F1 score: %f' % f1)
+'''
+#report 출력을 위한 reduce
+#label_predictions=np.argmax(np.round(test_x_predictions), axis=1)
+#report=classification_report(test_y, label_predictions)
+#print(report)
+
+#report 측정
+report=classification_report(error_df.True_class, pred_y)
+print(report)
+
 conf_matrix = confusion_matrix(error_df.True_class, pred_y)
 
 plt.figure(figsize=(12, 12))

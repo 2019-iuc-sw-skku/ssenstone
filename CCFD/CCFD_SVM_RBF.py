@@ -1,9 +1,7 @@
 import pickle
-import tensorflow
-from sklearn import svm, metrics, model_selection,preprocessing
+from sklearn import svm, metrics, model_selection, preprocessing
 import pandas as pd
 from matplotlib import pyplot as plt
-import matplotlib
 import seaborn as sns
 
 class CCFDT:
@@ -42,7 +40,8 @@ class CCFDT:
         clf=svm.SVC(random_state=0, gamma=0.0001, cache_size=300, C=100)
         clf.fit(train_x,train_y)
 
-        pickle.dump(clf, open("./CCFD/model_svm_rbf" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(clf, open("./CCFD/models/model_svm_rbf" + str(self.model_set) + ".sav", "wb"))
+        pickle.dump(sc, open("./CCFD/scalers/scaler_svm_rbf" + str(self.model_set) + ".sav", "wb"))
 
         pre=clf.predict(test_x)
         score=metrics.accuracy_score(test_y,pre)
