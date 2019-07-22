@@ -147,16 +147,16 @@ class Trainer(threading.Thread):
             self.model = nb
 
         elif model_name == ModelNames.SVM:
-            clf = svm.SVC(kernel='linear', random_state=self.RSEED, **properties)
-            clf.fit(train_x, train_y)
-            pickle.dump(clf, open(output_path, "wb"))
-            self.model = clf
-
-        elif model_name == ModelNames.SVM_RBF_KERNEL:
             clf = svm.SVC(random_state=self.RSEED, **properties)
             clf.fit(train_x, train_y)
             pickle.dump(clf, open(output_path, "wb"))
             self.model = clf
+
+#        elif model_name == ModelNames.SVM_RBF_KERNEL:
+#            clf = svm.SVC(random_state=self.RSEED, **properties)
+#            clf.fit(train_x, train_y)
+#            pickle.dump(clf, open(output_path, "wb"))
+#            self.model = clf
 
         elif model_name == ModelNames.AUTOENCODED_DEEP_LEARNING:
 
@@ -189,7 +189,8 @@ class Trainer(threading.Thread):
             Decoder3 = Dense(input_dimension, activation="relu")(Decoder2)
 
             AutoEncoderModel = Model(inputs=input_layer, outputs=Decoder3)
-            AutoEncoderModel.compile(metrics=['accuracy'], loss=properties.get('loss'), optimizer=properties.get('optimizer'))
+            AutoEncoderModel.compile(metrics=['accuracy'], loss='mean_squared_error', optimizer='adam')
+            # AutoEncoderModel.compile(metrics=['accuracy'], loss=properties.get('loss'), optimizer=properties.get('optimizer'))
 
             cp = ModelCheckpoint(filepath=output_path, save_best_only=True)
             shuffle = True
