@@ -309,7 +309,7 @@ class TrainerGUI(QWidget):
         self.te2.setText(fname[0])
 
     def resultButton(self):
-        self.fd.predict_current_model()
+        self.fd.predict_current_model(self.scaler)
 
     def startButton(self):
         self.startbtn.setDisabled(True)
@@ -334,7 +334,7 @@ class TrainerGUI(QWidget):
 
             self.statelabel.setText('Training...')
 
-
+            self.scaler = scaler
             self.fd = trainer.Trainer(self.le.text(), train_pct=pct, output_path=sav, output_scaler_path=scaler,
                                       model_name=ModelNames(self.cb.currentIndex()), properties=arguments)
             self.progress = ProgressThread(self.statelabel, self.fd, self.startbtn, self.resultbtn)

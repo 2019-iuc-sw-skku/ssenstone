@@ -113,10 +113,11 @@ class Trainer(threading.Thread):
             
             x = new_df.drop('Class', axis=1)
             y = new_df['Class']
-            x, _, y, _ = train_test_split(x, y, train_size=train_pct)
+            x, tx, y, ty = train_test_split(x, y, train_size=train_pct)
 
             train_x = x.values
             train_y = y.values
+            test_x = tx.values
 
             sc = StandardScaler()
             train_x = sc.fit_transform(train_x)
@@ -163,12 +164,6 @@ class Trainer(threading.Thread):
 
             elif model_name == ModelNames.AUTOENCODED_DEEP_LEARNING:
 
-                x = df_norm[df_norm.Class == 0]
-                x = x.drop(['Class'], axis=1)
-                x, _ = train_test_split(x, train_size=train_pct)
-
-                train_x = x.values
-
                 input_dimension = train_x.shape[1]
                 learning_rate = properties.get('learning_rate')
                 encoding_dimension = properties.get('encoding_dimension')
@@ -204,7 +199,8 @@ class Trainer(threading.Thread):
                                             batch_size=properties.get('batch_size'),
                                             shuffle=shuffle,
                                             verbose=1,
-                                            callbacks=[cp]).history
+                                            callbacks=[cp], 
+                                            validation_data=(test_x, test_x)).history
                 
                 self.model = AutoEncoderModel
 
@@ -233,24 +229,30 @@ class Trainer(threading.Thread):
 
 
             elif self.model_name == ModelNames.AUTOENCODED_DEEP_LEARNING:
-                threshold_fixed = 5
+                threshold_fixed = 9
 
                 test_x_predictions = self.model.predict(test_x)
                 mse = np.mean(np.power(test_x - test_x_predictions, 2), axis=1)
                 error_df = pd.DataFrame({'Reconstruction_error': mse, 'True_class': test_y})
+                error_df['idx'] = range(1, len(error_df)+1)
 
                 predicted = [1 if e > threshold_fixed else 0 for e in error_df.Reconstruction_error.values]
 
 
             conf_matrix = confusion_matrix(test_y, predicted)
-
             fig = plt.figure(figsize=(12, 12))
+            '''
+            sns.scatterplot(x='idx', y='Reconstruction_error', hue='True_class', data=error_df)
+            plt.title('scatter plot')
+            plt.ylabel('error')
+            plt.xlabel('instance number')
+            plt.show()
+            '''
             sns.heatmap(conf_matrix, xticklabels=LABELS, yticklabels=LABELS, annot=True, fmt="d")
             plt.title("Confusion matrix")
             plt.ylabel('True class')
             plt.xlabel('Predicted class')
             plt.show()
-
 
 """
 if __name__ == '__main__':
