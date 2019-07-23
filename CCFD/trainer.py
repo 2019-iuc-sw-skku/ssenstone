@@ -3,7 +3,7 @@
 '''
 
 import pickle
-
+import csv
 from keras import backend as K
 import matplotlib
 matplotlib.use('TkAgg')
@@ -27,9 +27,10 @@ from model_names import ModelNames
 
 
 class Trainer(threading.Thread):
-    def __init__(self, filepath, train_pct, output_path, output_scaler_path, model_name, properties, random_state=None):
+    def __init__(self, newfilepath, filepath, train_pct, output_path, output_scaler_path, model_name, properties, random_state=None):
         '''
         parameters:
+            newfilepath(list[str]): new data sets' path list
             filepath(str): path to csv dataset file
             random_state: random seed
 
@@ -88,6 +89,8 @@ class Trainer(threading.Thread):
         self.fname = filepath
         self.model = None
 
+        self.newfilepath = newfilepath
+
         self.train_pct = train_pct
         self.output_path = output_path
         self.output_scaler_path = output_scaler_path
@@ -95,7 +98,19 @@ class Trainer(threading.Thread):
         self.properties = properties
 
     def run(self):
+        self.combining()
         self.training(self.train_pct, self.output_path, self.output_scaler_path, self.model_name, self.properties)
+
+    def combining(self):
+        with open(self.fname, 'a', newline='') as original_data:
+            if self.newfilepath != ['']:
+                filewriter = csv.writer(original_data)
+                for path in self.newfilepath:
+                    with open(path, 'r', newline='') as new_data:
+                        filereader = csv.reader(new_data)
+                        header = next(filereader)
+                        for row in filereader:
+                            filewriter.writerow(row)
 
     def training(self, train_pct, output_path, output_scaler_path, model_name, properties):
         self.graph = tf.get_default_graph()
@@ -224,11 +239,8 @@ class Trainer(threading.Thread):
             test_x = df_norm.drop(['Class'], axis=1)
             test_x = scaler.transform(test_x)
             predicted = []
-            if self.model_name == ModelNames.RANDOM_FOREST:
-                predicted = self.model.predict(test_x)
 
-
-            elif self.model_name == ModelNames.AUTOENCODED_DEEP_LEARNING:
+            if self.model_name == ModelNames.AUTOENCODED_DEEP_LEARNING:
                 threshold_fixed = 9
 
                 test_x_predictions = self.model.predict(test_x)
@@ -238,6 +250,8 @@ class Trainer(threading.Thread):
 
                 predicted = [1 if e > threshold_fixed else 0 for e in error_df.Reconstruction_error.values]
 
+            else:
+                predicted = self.model.predict(test_x)
 
             conf_matrix = confusion_matrix(test_y, predicted)
             fig = plt.figure(figsize=(12, 12))
