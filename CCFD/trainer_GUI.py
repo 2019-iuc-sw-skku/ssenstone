@@ -7,13 +7,13 @@ trainer에게 학습하는데 필요한 인자들과 같이 전달을 합니다.
 '''
 
 import sys
-import csv
 import trainer
 import threading
 import time
 import winsound
 from model_names import ModelNames
 from PyQt5.QtWidgets import *
+
 
 class ProgressThread(threading.Thread):
     def __init__(self, text, fd, btn, resbtn):
@@ -339,20 +339,18 @@ class TrainerGUI(QWidget):
 
             arguments = self.getProperties()
 
-            self.statelabel.setText('Combining data...')
-            self.combineData()
-            self.te.clear()
-            self.pathlist = []
-
             self.statelabel.setText('Training...')
 
             self.scaler = scaler
-            self.fd = trainer.Trainer(self.le.text(), train_pct=pct, output_path=sav, output_scaler_path=scaler,
+            self.fd = trainer.Trainer(self.pathlist, self.le.text(), train_pct=pct, output_path=sav, output_scaler_path=scaler,
                                       model_name=ModelNames(self.cb.currentIndex()), properties=arguments)
             self.progress = ProgressThread(self.statelabel, self.fd, self.startbtn, self.resultbtn)
 
             self.fd.start()
             self.progress.start()
+
+            self.te.clear()
+            self.pathlist = []
 
         except FileNotFoundError:
             msgbox = QMessageBox()
@@ -369,17 +367,6 @@ class TrainerGUI(QWidget):
             msgbox.setText('Please select output path correctly')
             msgbox.exec()
             self.statelabel.setText('Wait...')
-
-    def combineData(self):
-        with open(self.le.text(), 'a', newline='') as original_data:
-            if self.pathlist != ['']:
-                filewriter = csv.writer(original_data)
-                for path in self.pathlist:
-                    with open(path, 'r', newline='') as new_data:
-                        filereader = csv.reader(new_data)
-                        header = next(filereader)
-                        for row in filereader:
-                            filewriter.writerow(row)
     
     def getProperties(self):
         properties = dict()
