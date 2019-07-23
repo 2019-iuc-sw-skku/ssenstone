@@ -7,5 +7,4 @@ class ModelNames(enum.Enum):
     LOGISTIC_REGRESSION = 3
     ADAPTIVE_BOOST = 4
     NAIVE_BAYES = 5
-    SVM_RBF_KERNEL = 6
     
