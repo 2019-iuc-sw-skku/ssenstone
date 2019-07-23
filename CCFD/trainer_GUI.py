@@ -11,6 +11,7 @@ import csv
 import trainer
 import threading
 import time
+import winsound
 from model_names import ModelNames
 from PyQt5.QtWidgets import *
 
@@ -27,6 +28,7 @@ class ProgressThread(threading.Thread):
         while self.fd.is_alive():
             time.sleep(1)
 
+        winsound.MessageBeep()
         self.text.setText('Done')
         self.btn.setDisabled(False)
         self.resbtn.setDisabled(False)
@@ -145,6 +147,9 @@ class TrainerGUI(QWidget):
         return groupbox
 
     def modelChanged(self):
+        self.te1.clear()
+        self.te2.clear()
+
         if self.cb.currentText() == 'Random Forest':
             self.rfshow()
             self.dlhide()
@@ -190,12 +195,14 @@ class TrainerGUI(QWidget):
         self.svmcombo.show()
         self.svmoption1.show()
         self.svmtext1.show()
+        self.svmtip1.show()
 
     def svmhide(self):
         self.svmoption.hide()
         self.svmcombo.hide()
         self.svmoption1.hide()
         self.svmtext1.hide()
+        self.svmtip1.hide()
 
     def lrshow(self):
         self.lroption.show()
@@ -231,10 +238,12 @@ class TrainerGUI(QWidget):
         self.svmcombo = QComboBox(self)
         self.svmcombo.addItems(['rbf', 'linear'])
         self.optiongrid.addWidget(self.svmcombo, 0, 1)
-        self.svmoption1 = QLabel('C (penalty)')
+        self.svmoption1 = QLabel('C')
         self.optiongrid.addWidget(self.svmoption1, 0, 2)
+        self.svmtip1 = QLabel('(penalty)')
+        self.optiongrid.addWidget(self.svmtip1, 0, 3)
         self.svmtext1 = QLineEdit('1.0')
-        self.optiongrid.addWidget(self.svmtext1, 0, 3)
+        self.optiongrid.addWidget(self.svmtext1, 0, 4)
 
         
         self.lroption = QLabel('C', self)
@@ -330,7 +339,10 @@ class TrainerGUI(QWidget):
 
             arguments = self.getProperties()
 
+            self.statelabel.setText('Combining data...')
             self.combineData()
+            self.te.clear()
+            self.pathlist = []
 
             self.statelabel.setText('Training...')
 
@@ -346,14 +358,17 @@ class TrainerGUI(QWidget):
             msgbox = QMessageBox()
             msgbox.setText('Please select data correctly')
             msgbox.exec()
+            self.statelabel.setText('Wait...')
         except ValueError:
             msgbox = QMessageBox()
             msgbox.setText('Please write values correctly')
             msgbox.exec()
+            self.statelabel.setText('Wait...')
         except FilePathError:
             msgbox = QMessageBox()
             msgbox.setText('Please select output path correctly')
             msgbox.exec()
+            self.statelabel.setText('Wait...')
 
     def combineData(self):
         with open(self.le.text(), 'a', newline='') as original_data:
