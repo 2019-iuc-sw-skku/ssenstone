@@ -113,6 +113,7 @@ class Trainer(threading.Thread):
                             filewriter.writerow(row)
 
     def training(self, train_pct, output_path, output_scaler_path, model_name, properties):
+        K.clear_session()
         self.graph = tf.get_default_graph()
         with self.graph.as_default():
             self.model_name = model_name
