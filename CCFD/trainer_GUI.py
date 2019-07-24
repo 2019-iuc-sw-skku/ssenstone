@@ -380,6 +380,10 @@ class TrainerGUI(QWidget):
         elif self.cb.currentText() == 'Support Vector Machine':
             properties[self.svmoption.text()] = self.svmcombo.currentText()
             properties[self.svmoption1.text()] = float(self.svmtext1.text())
+            if properties[self.svmoption.text()]=='rbf':
+                properties[self.svmoption1.text()]= float(100)
+                properties['gamma']=0.0001
+                properties['cache_size']=300
 
         elif self.cb.currentText() == 'Logistic Regression':
             properties[self.lroption.text()] = float(self.lrtext.text())

@@ -128,7 +128,7 @@ class Trainer(threading.Thread):
             
             x = new_df.drop('Class', axis=1)
             y = new_df['Class']
-            x, tx, y, ty = train_test_split(x, y, train_size=train_pct)
+            x, tx, y, ty = train_test_split(x, y, train_size=train_pct, stratify=y)
 
             train_x = x.values
             train_y = y.values
