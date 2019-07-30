@@ -189,7 +189,7 @@ class Trainer(threading.Thread):
                     del properties['learning_rate']
 
                 if encoding_dimension is None:
-                    encoding_dimension = 32
+                    encoding_dimension = input_dimension
                 else:
                     del properties['encoding_dimension']            
 
@@ -200,7 +200,7 @@ class Trainer(threading.Thread):
                 Encoder3 = Dense(int(encoding_dimension/4), activation="tanh")(Encoder2)
                 Decoder1 = Dense(int(encoding_dimension/4), activation="relu")(Encoder3)
                 Decoder2 = Dense(int(encoding_dimension/2), activation="tanh")(Decoder1)
-                Decoder3 = Dense(input_dimension, activation="relu")(Decoder2)
+                Decoder3 = Dense(input_dimension, activation="softmax")(Decoder2)
 
                 AutoEncoderModel = Model(inputs=input_layer, outputs=Decoder3)
                 AutoEncoderModel.compile(metrics=['accuracy'], loss='mean_squared_error', optimizer='adam')
