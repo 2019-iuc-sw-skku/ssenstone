@@ -5,6 +5,7 @@ class ModelNames(enum.Enum):
     AUTOENCODED_DEEP_LEARNING = 1
     SVM = 2
     LOGISTIC_REGRESSION = 3
-    ADAPTIVE_BOOST = 4
-    NAIVE_BAYES = 5
+    OCSVM = 4
+    ADAPTIVE_BOOST = 5
+    NAIVE_BAYES = 6
     

@@ -47,6 +47,12 @@ class MyTcpHandler(socketserver.StreamRequestHandler):
                         score = score + 1
                     else:
                         flag.append(1)
+                elif name == ModelNames.OCSVM:
+                    if answer[0] == 1:
+                        flag.append(0)
+                        score = score + 1
+                    else:
+                        flag.append(1)
                 else:
                     if answer[0] == 0:
                         flag.append(0)
@@ -144,8 +150,10 @@ def run_server(listen_addr, model_paths, scaler_paths, model_names, pass_score=1
     thread.start()
     return thread
 
+'''
 if __name__ == '__main__':
     run_server((HOST, PORT),
                ['./CCFD/models/model_rf1.sav', './CCFD/models/model_svm_rbf1.sav', './CCFD/models/fraud_dl.h5'],
                ['./CCFD/scalers/scaler_rf1.sav', './CCFD/scalers/scaler_svm_rbf1.sav', './CCFD/scalers/scaler_dl.sav'],
                [ModelNames.RANDOM_FOREST, ModelNames.SVM, ModelNames.AUTOENCODED_DEEP_LEARNING], 3)
+'''

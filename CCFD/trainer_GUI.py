@@ -130,7 +130,7 @@ class TrainerGUI(QWidget):
         self.makeOptionGrid()
 
         self.cb = QComboBox(self)
-        self.cb.addItems(['Random Forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Logistic Regression'])
+        self.cb.addItems(['Random Forest', 'Autoencoded Deep Learning', 'Support Vector Machine', 'Logistic Regression', 'One Class Support Vector Machine'])
         self.cb.currentIndexChanged.connect(self.modelChanged)
 
         self.pcttext = QLineEdit('0.4')
@@ -155,24 +155,36 @@ class TrainerGUI(QWidget):
             self.dlhide()
             self.svmhide()
             self.lrhide()
+            self.ocsvmhide()
 
         elif self.cb.currentText() == 'Autoencoded Deep Learning':
             self.rfhide()
             self.dlshow()
             self.svmhide()
             self.lrhide()
+            self.ocsvmhide()
 
         elif self.cb.currentText() == 'Support Vector Machine':
             self.rfhide()
             self.dlhide()
             self.svmshow()
             self.lrhide()
+            self.ocsvmhide()
 
         elif self.cb.currentText() == 'Logistic Regression':
             self.rfhide()
             self.dlhide()
             self.svmhide()
             self.lrshow()
+            self.ocsvmhide()
+
+        elif self.cb.currentText() == 'One Class Support Vector Machine':
+            self.rfhide()
+            self.dlhide()
+            self.svmhide()
+            self.lrhide()
+            self.ocsvmshow()
+
 
     def rfshow(self):
         self.rfoption.show()
@@ -220,6 +232,30 @@ class TrainerGUI(QWidget):
         self.lroption2.hide()
         self.lrcombo.hide()
 
+    def ocsvmshow(self):
+        self.ocsvmoption.show()
+        self.ocsvmoption1.show()
+        self.ocsvmoption2.show()
+        self.ocsvmcombo1.show()
+        self.ocsvmtext.show()
+        self.ocsvmtext1.show()
+        self.ocsvmtext2.show()
+
+    def ocsvmhide(self):
+        self.ocsvmoption.hide()
+        self.ocsvmoption1.hide()
+        self.ocsvmoption2.hide()
+        self.ocsvmcombo1.hide()
+        self.ocsvmtext.hide()
+        self.ocsvmtext1.hide()
+        self.ocsvmtext2.hide()    
+
+    def ocsvmComboFunc(self):
+        if self.ocsvmcombo1.currentText() == 'scale':
+            self.ocsvmtext1.setDisabled(True)
+        elif self.ocsvmcombo1.currentText() == 'manual':
+            self.ocsvmtext1.setDisabled(False)
+
     def makeOptionGrid(self):
         self.optiongrid = QGridLayout()
 
@@ -260,9 +296,28 @@ class TrainerGUI(QWidget):
         self.lrcombo.addItems(['newton-cg', 'lbfgs', 'sag', 'saga'])
         self.optiongrid.addWidget(self.lrcombo, 0, 1)
 
+        self.ocsvmoption = QLabel('degree', self)
+        self.optiongrid.addWidget(self.ocsvmoption, 0, 0)
+        self.ocsvmtext = QLineEdit('4')
+        self.optiongrid.addWidget(self.ocsvmtext, 0, 1)
+        self.ocsvmoption1 = QLabel('gamma', self)
+        self.optiongrid.addWidget(self.ocsvmoption1, 0, 2)
+        self.ocsvmcombo1 = QComboBox(self)
+        self.ocsvmcombo1.addItems(['scale', 'manual'])
+        self.ocsvmcombo1.currentIndexChanged.connect(self.ocsvmComboFunc)
+        self.optiongrid.addWidget(self.ocsvmcombo1, 0, 3)
+        self.ocsvmtext1 = QLineEdit('')
+        self.ocsvmtext1.setDisabled(True)
+        self.optiongrid.addWidget(self.ocsvmtext1, 0, 4)
+        self.ocsvmoption2 = QLabel('nu', self)
+        self.optiongrid.addWidget(self.ocsvmoption2, 0, 5)
+        self.ocsvmtext2 = QLineEdit('0.01')
+        self.optiongrid.addWidget(self.ocsvmtext2, 0, 6)
+
         self.dlhide()
         self.svmhide()
         self.lrhide()
+        self.ocsvmhide()
         
     def trainStart(self):
         groupbox = QGroupBox('Training')
@@ -389,6 +444,14 @@ class TrainerGUI(QWidget):
             properties[self.lroption.text()] = float(self.lrtext.text())
             properties[self.lroption1.text()] = int(self.lrtext1.text())
             properties[self.lroption2.text()] = self.lrcombo.currentText()
+
+        elif self.cb.currentText() == 'One Class Support Vector Machine':
+            properties[self.ocsvmoption.text()] = int(self.ocsvmtext.text())
+            if self.ocsvmcombo1.currentText == 'scale':
+                properties[self.ocsvmoption1.text()] = 'scale'
+            elif self.ocsvmcombo1.currentText == 'manual':
+                properties[self.ocsvmoption1.text()] = float(self.ocsvmtext1.text())
+            properties[self.ocsvmoption2.text()] = float(self.ocsvmtext2.text())
 
         return properties
 
