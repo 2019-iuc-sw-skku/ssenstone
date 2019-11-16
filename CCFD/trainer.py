@@ -124,7 +124,6 @@ class Trainer(threading.Thread):
     #        df_norm['Time'] = StandardScaler().fit_transform(df_norm['Time'].values.reshape(-1, 1))
     #        df_norm['Amount'] = StandardScaler().fit_transform(df_norm['Amount'].values.reshape(-1, 1))
 
-            
             new_df = df_norm.sample(frac=1, random_state=self.RSEED)
             
             x = new_df.drop('Class', axis=1)
@@ -172,11 +171,12 @@ class Trainer(threading.Thread):
                 pickle.dump(clf, open(output_path, "wb"))
                 self.model = clf
 
-    #        elif model_name == ModelNames.SVM_RBF_KERNEL:
-    #            clf = svm.SVC(random_state=self.RSEED, **properties)
-    #            clf.fit(train_x, train_y)
-    #            pickle.dump(clf, open(output_path, "wb"))
-    #            self.model = clf
+            elif model_name == ModelNames.OCSVM:
+                ocsvm = svm.OneClassSVM(**properties)
+                train_x = train_x[train_y == 0]
+                ocsvm.fit(train_x)
+                pickle.dump(ocsvm, open(output_path, "wb"))
+                self.model = ocsvm
 
             elif model_name == ModelNames.AUTOENCODED_DEEP_LEARNING:
 
@@ -253,6 +253,12 @@ class Trainer(threading.Thread):
 
             else:
                 predicted = self.model.predict(test_x)
+                if self.model_name == ModelNames.OCSVM:
+                    for i in range(0, len(predicted)):
+                        if (predicted[i] == -1):
+                            predicted[i] = 1
+                        elif (predicted[i] == 1):
+                            predicted[i] = 0
 
             conf_matrix = confusion_matrix(test_y, predicted)
             fig = plt.figure(figsize=(12, 12))
