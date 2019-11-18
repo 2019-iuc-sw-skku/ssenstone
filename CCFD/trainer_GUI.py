@@ -309,7 +309,7 @@ class TrainerGUI(QWidget):
         self.ocsvmtext1 = QLineEdit('')
         self.ocsvmtext1.setDisabled(True)
         self.optiongrid.addWidget(self.ocsvmtext1, 0, 4)
-        self.ocsvmoption2 = QLabel('nu', self)
+        self.ocsvmoption2 = QLabel('nu ( 0 < x < 1 )', self)
         self.optiongrid.addWidget(self.ocsvmoption2, 0, 5)
         self.ocsvmtext2 = QLineEdit('0.01')
         self.optiongrid.addWidget(self.ocsvmtext2, 0, 6)
@@ -447,11 +447,13 @@ class TrainerGUI(QWidget):
 
         elif self.cb.currentText() == 'One Class Support Vector Machine':
             properties[self.ocsvmoption.text()] = int(self.ocsvmtext.text())
-            if self.ocsvmcombo1.currentText == 'scale':
+            if self.ocsvmcombo1.currentText() == 'scale':
                 properties[self.ocsvmoption1.text()] = 'scale'
-            elif self.ocsvmcombo1.currentText == 'manual':
+            elif self.ocsvmcombo1.currentText() == 'manual':
                 properties[self.ocsvmoption1.text()] = float(self.ocsvmtext1.text())
-            properties[self.ocsvmoption2.text()] = float(self.ocsvmtext2.text())
+            properties['nu'] = float(self.ocsvmtext2.text())
+            if properties['nu'] <= 0 or properties['nu'] >= 1:
+                raise ValueError
 
         return properties
 
