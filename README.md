@@ -17,5 +17,8 @@ Credit Card Fraud Detecting Service의 개발을 목표로 하는 repository입�
 ## trainer.py
 통합 모델 작성 프로그램입니다.
 
+## trainer_GUI.py
+trainer의 GUI입니다. trainer를 불러와 실행합니다.
+
 ## CCFD*.py
 분리된 모델 작성 프로그램입니다.
