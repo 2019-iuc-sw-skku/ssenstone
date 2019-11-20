@@ -3,7 +3,6 @@ import random
 
 
 class Generator:
-<<<<<<< HEAD
     df = pd.DataFrame()
     usecon = None
     uselin = None
@@ -55,43 +54,6 @@ class Generator:
                 prod = prod.join(res)
         
         '''
-=======
-    data = 0
-    usecon = None
-    uselin = None
-
-    def __init__(self, datapath, use_constant=True, use_linconv=True):
-        self.data = datapath
-        self.usecon = use_constant
-        self.uselin = use_linconv
-
-    #Not tested yet
-    def generate_columns(self, col_num):
-        df = pd.read_csv(self.data)
-        df = df.sample(frac=1)
-        df = df.drop('Class', axis=1)
-        rows = df.shape()[0]
-        cols = df.shape()[1]
-        prod = pd.DataFrame()
-        if self.usecon and self.uselin:
-            for i in range(col_num/2):
-                arr = [random.randrange(1, 100)]*rows
-                const_col = pd.DataFrame({('c'+i): arr})
-                prod.join(const_col)
-            for i in range(col_num - (col_num/2)):
-                linnum = random.randrange(2, 11)
-                res = pd.DataFrame()
-                for j in range(linnum):
-                    target_col = random.randrange(0, cols)
-                    tmp = df.iloc[:, target_col].copy()
-                    tmp = tmp.apply(lambda x: x*random.random())
-                    if j == 0:
-                        res = tmp
-                    else:
-                        res.add(tmp)
-                prod.join(res)
-
->>>>>>> 0132bfb6fec00f9cd6d9051c336d825e43ec5f15
         elif self.usecon:
             for i in range(col_num):
                 arr = [random.randrange(1, 100)]*rows
@@ -111,7 +73,6 @@ class Generator:
                     else:
                         res.add(tmp)
                 prod.join(res)
-<<<<<<< HEAD
         '''
 
         return prod
@@ -124,7 +85,3 @@ if __name__ == '__main__':
     gnt.update(df.join(prod))
     prod = gnt.generate_columns(5, 5)
     print(prod.head())
-=======
-
-        return prod
->>>>>>> 0132bfb6fec00f9cd6d9051c336d825e43ec5f15
