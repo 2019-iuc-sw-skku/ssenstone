@@ -13,8 +13,9 @@ class CCFD_OCSVM:
         self.TESTP = TESTP
         self.fname = fname
 
-    def training(self):
-        df = pd.read_csv(self.fname)
+    def training(self, df=None):
+        if df is None:
+            df = pd.read_csv(self.fname)
         normal_df = df[df['Class'] == 0]
         fraud_df = df[df['Class'] == 1]
 
@@ -24,6 +25,7 @@ class CCFD_OCSVM:
         df_norm['Amount'] = sc.fit_transform(df_norm['Amount'].values.reshape(-1, 1))
 
         train_x, test_x = train_test_split(df_norm, test_size=self.TESTP, random_state=self.RSEED)
+        test_x = df_norm
         train_x = train_x[train_x.Class == 0]
         train_x = train_x.drop(['Class'], axis=1)
         
@@ -54,7 +56,7 @@ class CCFD_OCSVM:
         print(report)
         
         cm = pd.DataFrame(confusion_matrix(test_y, predicted))
-        sns.heatmap(cm, annot=True)
+        sns.heatmap(cm, annot=True, fmt='d')
         plt.title("Confusion matrix")
         plt.ylabel('True class')
         plt.xlabel('Predicted class')
