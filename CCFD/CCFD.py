@@ -14,8 +14,9 @@ class CCFDT:
         self.fname = fname
         self.model_set = 0
 
-    def training(self):
-        df = pd.read_csv(self.fname)
+    def training(self, df=None):
+        if df is None:
+            df = pd.read_csv(self.fname)
         df = df.sample(frac=1)
         normal_df = df[df['Class'] == 0]
         fraud_df = df[df['Class'] == 1]
@@ -57,7 +58,11 @@ class CCFDT:
         print(report)
 
         cm = pd.DataFrame(confusion_matrix(test_y, predicted))
-        sns.heatmap(cm, annot=True)
+        sns.heatmap(cm, annot=True, fmt='d')
+        plt.title("Confusion matrix")
+        plt.ylabel('True class')
+        plt.xlabel('Predicted class')
+        plt.show()
    
     def show(self):
         plt.show()
