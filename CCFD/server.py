@@ -33,7 +33,7 @@ class MyTcpHandler(socketserver.StreamRequestHandler):
         print('%04d-%02d-%02d %02d:%02d:%02d' % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec), end='')
         print('[%s] is connected' %self.client_address[0])
         data = self.request.recv(1024)
-        nparr = pd.read_json(data.decode()).as_matrix()
+        nparr = pd.read_json(data.decode()).values
         score = 0
         flag = []
         with self.server.graph.as_default():
